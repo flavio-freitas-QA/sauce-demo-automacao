@@ -1,5 +1,5 @@
 {
-  "name": "qa-automation-daily",
+  "name": "sauce-demo-automacao",
   "version": "1.0.0",
   "description": "Portfólio de automação de testes com atualizações diárias, usando Cypress, Playwright e Postman.",
   "main": "index.js",
