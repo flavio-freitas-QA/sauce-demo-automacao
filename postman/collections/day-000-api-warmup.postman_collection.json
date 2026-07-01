@@ -1,0 +1,78 @@
+{
+  "info": {
+    "name": "Day 000 - API Warmup (JSONPlaceholder)",
+    "description": "Collection base para o dia semanal de testes de API. Cobre GET, POST e validação simples de schema.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET /posts/1 - deve retornar post existente",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/posts/1", "host": ["{{baseUrl}}"], "path": ["posts", "1"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code é 200', () => pm.response.to.have.status(200));",
+              "pm.test('Resposta contém campos esperados', () => {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property('id');",
+              "  pm.expect(json).to.have.property('title');",
+              "  pm.expect(json).to.have.property('body');",
+              "  pm.expect(json).to.have.property('userId');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST /posts - deve criar novo post",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/posts", "host": ["{{baseUrl}}"], "path": ["posts"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Post de teste automatizado\",\n  \"body\": \"Conteúdo gerado via Postman\",\n  \"userId\": 1\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code é 201', () => pm.response.to.have.status(201));",
+              "pm.test('Post criado retorna id', () => {",
+              "  pm.expect(pm.response.json()).to.have.property('id');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET /posts/9999 - deve retornar 404 para post inexistente",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/posts/9999", "host": ["{{baseUrl}}"], "path": ["posts", "9999"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code é 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

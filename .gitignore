@@ -1,0 +1,36 @@
+# Dependências
+node_modules/
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# Newman
+newman/
+
+# Ambiente
+.env
+.env.local
+
+# Build/dist
+dist/
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Logs
+npm-debug.log*
+*.log
+
+# SO
+.DS_Store
+Thumbs.db
