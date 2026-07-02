@@ -21,9 +21,11 @@ export class LoginPage {
 
   async login(username: string, password: string) {
     await this.goto();
+    await this.usernameInput.waitFor({ timeout: 30000 });
     await this.usernameInput.fill(username);
     await this.passwordInput.fill(password);
     await this.loginButton.click();
+    await this.page.waitForURL(/inventory\.html/, { timeout: 30000 });
   }
 
   async expectError(text: string) {
