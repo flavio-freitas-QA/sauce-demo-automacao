@@ -25,7 +25,12 @@ export class LoginPage {
     await this.usernameInput.fill(username);
     await this.passwordInput.fill(password);
     await this.loginButton.click();
-    await this.page.waitForURL(/inventory\.html/, { timeout: 30000 });
+
+    try {
+      await this.page.waitForURL(/inventory\.html/, { timeout: 10000 });
+    } catch {
+      await this.errorMessage.waitFor({ timeout: 10000 });
+    }
   }
 
   async expectError(text: string) {
