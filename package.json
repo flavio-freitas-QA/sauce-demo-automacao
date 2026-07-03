@@ -9,6 +9,7 @@
     "pw:test": "playwright test",
     "pw:test:ui": "playwright test --ui",
     "pw:report": "playwright show-report",
+    "pw:summary": "node scripts/playwright-summary.js",
     "api:test": "newman run postman/collections/day-000-api-warmup.postman_collection.json -e postman/environments/jsonplaceholder.postman_environment.json",
     "typecheck": "tsc --noEmit",
     "test:all": "npm run typecheck && npm run cy:run && npm run pw:test && npm run api:test"
