@@ -10,7 +10,9 @@
     "pw:test:ui": "playwright test --ui",
     "pw:report": "playwright show-report",
     "pw:summary": "node scripts/playwright-summary.js",
-    "api:test": "newman run postman/collections/day-000-api-warmup.postman_collection.json -e postman/environments/jsonplaceholder.postman_environment.json",
+    "api:test:jsonplaceholder": "newman run postman/collections/dia-004-jsonplaceholder.postman_collection.json -e postman/environments/jsonplaceholder.postman_environment.json",
+    "api:test:reqres": "newman run postman/collections/dia-004-reqres-auth.postman_collection.json -e postman/environments/reqres.postman_environment.json",
+    "api:test": "npm run api:test:jsonplaceholder && npm run api:test:reqres",
     "typecheck": "tsc --noEmit",
     "test:all": "npm run typecheck && npm run cy:run && npm run pw:test && npm run api:test"
   },

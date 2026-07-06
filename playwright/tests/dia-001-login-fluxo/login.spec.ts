@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { LoginPage } from "../../pages/LoginPage";
 import users from "../../fixtures/users.json";
 
-test.describe("Day 001 - Fluxo de Login | Sauce Demo (Playwright)", () => {
+test.describe("Dia 001 - Fluxo de Login | Sauce Demo (Playwright)", () => {
   test("deve logar com sucesso usando usuário padrão", async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.login(users.standard.username, users.standard.password);

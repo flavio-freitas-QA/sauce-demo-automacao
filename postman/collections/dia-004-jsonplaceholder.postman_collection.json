@@ -1,0 +1,351 @@
+{
+  "info": {
+    "name": "Dia 004 - JSONPlaceholder API",
+    "description": "Collection para CRUD, relacionamento e validação de schema em JSONPlaceholder.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "CRUD e Relacionamento — Posts",
+      "item": [
+        {
+          "name": "POST /posts - criar recurso",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Post criado para o Dia 004\",\n  \"body\": \"Conteúdo gerado via Newman\",\n  \"userId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code é 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Resposta contém estrutura válida do post', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an('object');",
+                  "  pm.expect(json.id).to.be.a('number');",
+                  "  pm.expect(json.title).to.be.a('string');",
+                  "  pm.expect(json.body).to.be.a('string');",
+                  "  pm.expect(json.userId).to.be.a('number');",
+                  "  pm.environment.set('postId', json.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /posts/{{postId}} - buscar recurso criado",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "{{postId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code é 200 ou 404 dependendo do mock', () => {",
+                  "  pm.expect([200, 404]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test('Resposta, quando existir, contém estrutura do post', () => {",
+                  "  const json = pm.response.json();",
+                  "  if (pm.response.code === 200) {",
+                  "    pm.expect(json).to.be.an('object');",
+                  "    pm.expect(json.id).to.be.a('number');",
+                  "    pm.expect(json.title).to.be.a('string');",
+                  "    pm.expect(json.body).to.be.a('string');",
+                  "    pm.expect(json.userId).to.be.a('number');",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /posts/{{postId}} - atualizar recurso",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Post atualizado no Dia 004\",\n  \"body\": \"Conteúdo atualizado via Newman\",\n  \"userId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "{{postId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code é 200 ou 500 dependendo do mock', () => {",
+                  "  pm.expect([200, 500]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test('Resposta, quando existir, confirma atualização do post', () => {",
+                  "  let json;",
+                  "  try {",
+                  "    json = pm.response.json();",
+                  "  } catch (error) {",
+                  "    json = null;",
+                  "  }",
+                  "  if (pm.response.code === 200) {",
+                  "    pm.expect(json).to.be.an('object');",
+                  "    pm.expect(json.id).to.be.a('number');",
+                  "    pm.expect(json.title).to.include('atualizado');",
+                  "    pm.expect(json.body).to.include('Newman');",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /posts/{{postId}} - deletar recurso",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "{{postId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code é 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta é um objeto vazio', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /posts/99999 - recurso inexistente",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/posts/99999",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "99999"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code é 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /posts - corpo malformado",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code é 201 como comportamento esperado do mock', () => pm.response.to.have.status(201));",
+                  "pm.test('Resposta retorna um identificador mesmo com payload incompleto', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an('object');",
+                  "  pm.expect(json.id).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /posts/{{postId}}/comments - relacionamento do post",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "{{postId}}", "comments"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code é 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta é um array de comentários', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an('array');",
+                  "  if (json.length > 0) {",
+                  "    json.forEach(comment => {",
+                  "      pm.expect(comment.postId).to.be.a('number');",
+                  "      pm.expect(comment.id).to.be.a('number');",
+                  "      pm.expect(comment.name).to.be.a('string');",
+                  "      pm.expect(comment.email).to.be.a('string');",
+                  "      pm.expect(comment.body).to.be.a('string');",
+                  "    });",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Recurso Adicional — Users",
+      "item": [
+        {
+          "name": "GET /users - listar usuários",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code é 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta é um array com schema de usuário', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an('array');",
+                  "  pm.expect(json.length).to.be.greaterThan(0);",
+                  "  json.forEach(user => {",
+                  "    pm.expect(user.id).to.be.a('number');",
+                  "    pm.expect(user.name).to.be.a('string');",
+                  "    pm.expect(user.email).to.be.a('string');",
+                  "    pm.expect(user.username).to.be.a('string');",
+                  "    pm.expect(user.address).to.be.an('object');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /users/1 - buscar usuário específico",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "1"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code é 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta contém estrutura aninhada do usuário', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an('object');",
+                  "  pm.expect(json.id).to.equal(1);",
+                  "  pm.expect(json.address).to.be.an('object');",
+                  "  pm.expect(json.address.city).to.be.a('string');",
+                  "  pm.expect(json.company).to.be.an('object');",
+                  "  pm.expect(json.company.name).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /users/1/todos - relacionamento usuário → tarefas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/1/todos",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "1", "todos"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code é 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta é um array de todos relacionados ao usuário', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an('array');",
+                  "  pm.expect(json.length).to.be.greaterThan(0);",
+                  "  json.forEach(todo => {",
+                  "    pm.expect(todo.userId).to.equal(1);",
+                  "    pm.expect(todo.id).to.be.a('number');",
+                  "    pm.expect(todo.title).to.be.a('string');",
+                  "    pm.expect(todo.completed).to.be.a('boolean');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

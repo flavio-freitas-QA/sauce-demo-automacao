@@ -1,6 +1,6 @@
 import LoginPage from "../../support/pages/LoginPage";
 
-describe("Day 001 - Fluxo de Login | Sauce Demo", () => {
+describe("Dia 001 - Fluxo de Login | Sauce Demo", () => {
   beforeEach(() => {
     cy.fixture("users").as("users");
   });

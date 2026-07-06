@@ -5,7 +5,7 @@ import { CartPage } from "../../pages/CartPage";
 import users from "../../fixtures/users.json";
 import products from "../../fixtures/products.json";
 
-test.describe("Day 002 - Fluxo de Carrinho | Sauce Demo", () => {
+test.describe("Dia 002 - Fluxo de Carrinho | Sauce Demo", () => {
   test.beforeEach(async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.login(users.standard.username, users.standard.password);
@@ -88,7 +88,7 @@ test.describe("Day 002 - Fluxo de Carrinho | Sauce Demo", () => {
   });
 });
 
-test.describe("Day 002 - Fluxo de Carrinho | Sauce Demo | Acesso direto", () => {
+test.describe("Dia 002 - Fluxo de Carrinho | Sauce Demo | Acesso direto", () => {
   test("deve redirecionar ao acessar o carrinho sem login", async ({ page }) => {
     await page.goto("/cart.html", { waitUntil: "domcontentloaded" });
     await expect(page).toHaveURL(/\/$/);
@@ -96,7 +96,7 @@ test.describe("Day 002 - Fluxo de Carrinho | Sauce Demo | Acesso direto", () => 
   });
 });
 
-test.describe("Day 002 - Fluxo de Carrinho | Sauce Demo | Usuário problem", () => {
+test.describe("Dia 002 - Fluxo de Carrinho | Sauce Demo | Usuário problem", () => {
   test.beforeEach(async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.login(users.problem.username, users.problem.password);

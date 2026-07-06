@@ -5,7 +5,7 @@ import CartPage from "../../support/pages/CartPage";
 let users: any;
 let products: any;
 
-describe("Day 002 - Fluxo de Carrinho | Sauce Demo", () => {
+describe("Dia 002 - Fluxo de Carrinho | Sauce Demo", () => {
   beforeEach(() => {
     cy.fixture("users").then((userData) => {
       users = userData;
@@ -117,7 +117,7 @@ describe("Day 002 - Fluxo de Carrinho | Sauce Demo", () => {
   });
 });
 
-describe("Day 002 - Fluxo de Carrinho | Sauce Demo | Acesso direto", () => {
+describe("Dia 002 - Fluxo de Carrinho | Sauce Demo | Acesso direto", () => {
   it("deve redirecionar ao acessar o carrinho sem login", () => {
     cy.visit("/cart.html", { failOnStatusCode: false });
     cy.location("pathname", { timeout: 15000 }).should("eq", "/");
@@ -125,7 +125,7 @@ describe("Day 002 - Fluxo de Carrinho | Sauce Demo | Acesso direto", () => {
   });
 });
 
-describe("Day 002 - Fluxo de Carrinho | Sauce Demo | Usuário problem", () => {
+describe("Dia 002 - Fluxo de Carrinho | Sauce Demo | Usuário problem", () => {
   beforeEach(() => {
     cy.fixture("users").then((userData) => {
       users = userData;
