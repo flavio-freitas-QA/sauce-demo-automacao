@@ -86,6 +86,19 @@ describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
     });
   });
 
+  it("deve calcular corretamente a taxa na Etapa 2", () => {
+    const expectedSubtotal = parsePrice(products.backpack.price) + parsePrice(products.bikeLight.price);
+    const expectedTax = Number((expectedSubtotal * 0.08).toFixed(2));
+
+    CartPage.clickCheckout();
+    CheckoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
+    CheckoutPage.clickContinue();
+    cy.location("pathname", { timeout: 15000 }).should("include", "/checkout-step-two.html");
+    CheckoutPage.getTax().should((value: string) => {
+      expect(parsePrice(value)).to.equal(expectedTax);
+    });
+  });
+
   it("deve calcular corretamente o total na Etapa 2", () => {
     const expectedSubtotal = parsePrice(products.backpack.price) + parsePrice(products.bikeLight.price);
     const expectedTax = Number((expectedSubtotal * 0.08).toFixed(2));
@@ -95,12 +108,39 @@ describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
     CheckoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
     CheckoutPage.clickContinue();
     cy.location("pathname", { timeout: 15000 }).should("include", "/checkout-step-two.html");
-    CheckoutPage.getTax().should((value: string) => {
-      expect(parsePrice(value)).to.equal(expectedTax);
-    });
     CheckoutPage.getTotal().should((value: string) => {
       expect(parsePrice(value)).to.equal(expectedTotal);
     });
+  });
+
+  it("deve exibir o resumo dos itens corretamente na Etapa 2", () => {
+    const expectedProducts = [products.backpack, products.bikeLight];
+
+    CartPage.clickCheckout();
+    CheckoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
+    CheckoutPage.clickContinue();
+    cy.location("pathname", { timeout: 15000 }).should("include", "/checkout-step-two.html");
+
+    expectedProducts.forEach((product) => {
+      CheckoutPage.getSummaryItemByName(product.name).should("be.visible");
+      CheckoutPage.getSummaryItemByName(product.name).should("contain.text", product.price);
+    });
+  });
+
+  it("deve permitir checkout com carrinho vazio (comportamento real do app)", () => {
+    cy.visit("/cart.html", { failOnStatusCode: false });
+
+    CartPage.removeItemByName(products.backpack.name);
+    CartPage.removeItemByName(products.bikeLight.name);
+
+    cy.get(".cart_item").should("not.exist");
+
+    CartPage.clickCheckout();
+    CheckoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
+    CheckoutPage.clickContinue();
+    cy.location("pathname", { timeout: 15000 }).should("include", "/checkout-step-two.html");
+    CheckoutPage.clickFinish();
+    CheckoutPage.getConfirmationMessage().should("contain.text", "Thank you for your order!");
   });
 
   it("deve esvaziar o carrinho após finalizar o checkout", () => {

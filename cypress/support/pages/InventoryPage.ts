@@ -44,7 +44,30 @@ class InventoryPage {
   }
 
   sortProducts(option: string) {
-    cy.get("[data-test='product_sort_container']").select(option);
+    cy.get(".inventory_list").should("be.visible");
+    cy.get("select.product_sort_container", { timeout: 10000 }).should("be.visible").select(option);
+  }
+
+  clickProductByName(name: string) {
+    this.getProductCard(name).find(".inventory_item_name").click();
+  }
+
+  getAllProductNames() {
+    return cy.get(".inventory_item_name").then(($names) => {
+      return Cypress._.map($names, (el) => el.innerText.trim());
+    });
+  }
+
+  getAllProductPrices() {
+    return cy.get(".inventory_item_price").then(($prices) => {
+      return Cypress._.map($prices, (el) => {
+        return parseFloat(el.innerText.replace("$", "").trim());
+      });
+    });
+  }
+
+  getFooterLinks() {
+    return cy.get(".footer a");
   }
 }
 

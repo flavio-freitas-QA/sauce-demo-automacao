@@ -115,6 +115,28 @@ describe("Dia 002 - Fluxo de Carrinho | Sauce Demo", () => {
     cy.url().should("include", "/inventory.html");
     cy.contains("Products").should("be.visible");
   });
+
+  it("deve persistir o carrinho após recarregar a página (estado mantido via sessionStorage)", () => {
+    const product = products.backpack;
+
+    InventoryPage.addProductByName(product.name);
+    InventoryPage.getCartBadgeCount().should("eq", 1);
+
+    cy.reload();
+    cy.get(".shopping_cart_badge", { timeout: 10000 }).should("have.text", "1");
+    InventoryPage.getProductActionButton(product.name).should("contain.text", "Remove");
+  });
+
+  it("deve acessar o carrinho autenticado e exibir a página corretamente", () => {
+    const product = products.backpack;
+
+    InventoryPage.addProductByName(product.name);
+    cy.visit("/cart.html", { failOnStatusCode: false });
+
+    cy.url().should("include", "/cart.html");
+    cy.contains("Your Cart").should("be.visible");
+    CartPage.getItemByName(product.name).should("be.visible");
+  });
 });
 
 describe("Dia 002 - Fluxo de Carrinho | Sauce Demo | Acesso direto", () => {

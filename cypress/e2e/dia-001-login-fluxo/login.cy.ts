@@ -30,6 +30,20 @@ describe("Dia 001 - Fluxo de Login | Sauce Demo", () => {
     LoginPage.getErrorMessage().should("contain.text", "Username is required");
   });
 
+  it("deve exibir erro ao preencher apenas o usuário e deixar senha vazia", () => {
+    LoginPage.visit();
+    LoginPage.fillUsername("standard_user");
+    LoginPage.submit();
+    LoginPage.getErrorMessage().should("contain.text", "Password is required");
+  });
+
+  it("deve exibir erro ao preencher apenas a senha e deixar usuário vazio", () => {
+    LoginPage.visit();
+    LoginPage.fillPassword("secret_sauce");
+    LoginPage.submit();
+    LoginPage.getErrorMessage().should("contain.text", "Username is required");
+  });
+
   it("deve permitir logout após login bem-sucedido", function () {
     LoginPage.login(this.users.standard.username, this.users.standard.password);
     cy.get("#react-burger-menu-btn").click();

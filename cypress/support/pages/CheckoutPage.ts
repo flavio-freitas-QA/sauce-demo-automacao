@@ -41,6 +41,14 @@ class CheckoutPage {
     return cy.get("[data-test='error']");
   }
 
+  getSummaryItems() {
+    return cy.get(".cart_item");
+  }
+
+  getSummaryItemByName(name: string) {
+    return cy.contains(".cart_item", name);
+  }
+
   getItemTotal() {
     return cy.contains(".summary_subtotal_label", /Item total:/i).invoke("text");
   }
