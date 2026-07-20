@@ -8,7 +8,7 @@ export class InventoryPage {
   constructor(page: Page) {
     this.page = page;
     this.cartLink = page.locator(".shopping_cart_link");
-    this.sortDropdown = page.locator("[data-test='product_sort_container']");
+    this.sortDropdown = page.locator("select.product_sort_container");
   }
 
   async goto() {
@@ -58,5 +58,25 @@ export class InventoryPage {
 
   async sortProducts(option: string) {
     await this.sortDropdown.selectOption(option);
+  }
+
+  async clickProductByName(name: string) {
+    await this.getProductCard(name).locator(".inventory_item_name").click();
+  }
+
+  async getAllProductNames() {
+    return this.page.locator(".inventory_item_name").evaluateAll((elements) =>
+      elements.map((element) => element.textContent?.trim() || ""),
+    );
+  }
+
+  async getAllProductPrices() {
+    return this.page.locator(".inventory_item_price").evaluateAll((elements) =>
+      elements.map((element) => Number((element.textContent || "").replace("$", "").trim())),
+    );
+  }
+
+  footerLinks() {
+    return this.page.locator(".footer a");
   }
 }

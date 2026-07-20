@@ -65,4 +65,8 @@ export class CheckoutPage {
   async expectValidationError(text: string) {
     await expect(this.errorMessage).toContainText(text);
   }
+
+  getSummaryItemByName(name: string) {
+    return this.page.locator(".cart_item").filter({ hasText: name });
+  }
 }

@@ -86,6 +86,29 @@ test.describe("Dia 002 - Fluxo de Carrinho | Sauce Demo", () => {
     await cartPage.clickContinueShopping();
     await expect(page).toHaveURL(/inventory.html/);
   });
+
+  test("deve persistir o carrinho após recarregar a página (estado mantido via sessionStorage)", async ({ page }) => {
+    const inventoryPage = new InventoryPage(page);
+
+    await inventoryPage.addProductByName(products.backpack.name);
+    await expect.poll(() => inventoryPage.getCartBadgeCount()).toBe(1);
+
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(page.locator(".shopping_cart_badge")).toHaveText("1", { timeout: 10000 });
+    await expect(inventoryPage.getProductCard(products.backpack.name).getByRole("button")).toContainText("Remove");
+  });
+
+  test("deve acessar o carrinho autenticado e exibir a página corretamente", async ({ page }) => {
+    const inventoryPage = new InventoryPage(page);
+    const cartPage = new CartPage(page);
+
+    await inventoryPage.addProductByName(products.backpack.name);
+    await cartPage.goto();
+
+    await expect(page).toHaveURL(/cart\.html/);
+    await expect(page.getByText("Your Cart")).toBeVisible();
+    await expect(cartPage.getItemByName(products.backpack.name)).toBeVisible();
+  });
 });
 
 test.describe("Dia 002 - Fluxo de Carrinho | Sauce Demo | Acesso direto", () => {
@@ -105,7 +128,10 @@ test.describe("Dia 002 - Fluxo de Carrinho | Sauce Demo | Usuário problem", () 
 
   test("deve manter o fluxo funcional do carrinho com problem_user", async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
+    const cartPage = new CartPage(page);
     await inventoryPage.addProductByName(products.backpack.name);
     await expect.poll(() => inventoryPage.getCartBadgeCount()).toBe(1);
+    await cartPage.goto();
+    await expect(cartPage.getItemByName(products.backpack.name)).toBeVisible();
   });
 });

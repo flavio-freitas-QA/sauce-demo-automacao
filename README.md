@@ -24,6 +24,11 @@ Demonstrar, de forma prática e contínua, domínio em:
 | Dia | Ferramenta | Fluxo testado | Destaque técnico |
 |-----|-----------|----------------|-------------------|
 | 001 | Cypress + Playwright | Login (Sauce Demo) | Page Object Model, fixtures de usuários, casos negativos |
+| 002 | Cypress + Playwright | Carrinho de compras (Sauce Demo) | Add/remove, persistência de estado, acesso autenticado e acesso direto |
+| 003 | Cypress + Playwright | Checkout (Sauce Demo) | Validações de formulário, subtotal, taxa, total e resumo do pedido |
+| 004 | Postman/Newman | APIs públicas JSONPlaceholder e ReqRes | Collections, environments, contratos e cenários negativos |
+| 005 | Cypress + Playwright | Catálogo, menu lateral e performance | Ordenação, detalhe do produto, footer, reset/logout/about e `performance_glitch_user` |
+| 006 | Cypress + Playwright | Usuários especiais (Sauce Demo) | `problem_user`, `error_user`, `visual_user` e bugs conhecidos documentados |
 
 > Tabela atualizada a cada novo dia. Detalhes de cada entrada em [`docs/`](./docs).
 

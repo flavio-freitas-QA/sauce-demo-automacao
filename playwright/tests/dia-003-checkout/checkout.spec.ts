@@ -114,6 +114,52 @@ test.describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
     await expect(checkoutPage.total).toContainText(`$${expectedTotal.toFixed(2)}`);
   });
 
+  test("deve calcular corretamente a taxa na Etapa 2", async ({ page }) => {
+    const cartPage = new CartPage(page);
+    const checkoutPage = new CheckoutPage(page);
+    const expectedSubtotal = parsePrice(products.backpack.price) + parsePrice(products.bikeLight.price);
+    const expectedTax = Number((expectedSubtotal * 0.08).toFixed(2));
+
+    await cartPage.clickCheckout();
+    await checkoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
+    await checkoutPage.clickContinue();
+    await page.waitForURL(/checkout-step-two\.html/, { timeout: 15000 });
+    await expect(checkoutPage.tax).toContainText(`$${expectedTax.toFixed(2)}`);
+  });
+
+  test("deve exibir o resumo dos itens corretamente na Etapa 2", async ({ page }) => {
+    const cartPage = new CartPage(page);
+    const checkoutPage = new CheckoutPage(page);
+    const expectedProducts = [products.backpack, products.bikeLight];
+
+    await cartPage.clickCheckout();
+    await checkoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
+    await checkoutPage.clickContinue();
+    await page.waitForURL(/checkout-step-two\.html/, { timeout: 15000 });
+
+    for (const product of expectedProducts) {
+      const summaryItem = checkoutPage.getSummaryItemByName(product.name);
+      await expect(summaryItem).toBeVisible();
+      await expect(summaryItem).toContainText(product.price);
+    }
+  });
+
+  test("deve permitir checkout com carrinho vazio (comportamento real do app)", async ({ page }) => {
+    const cartPage = new CartPage(page);
+    const checkoutPage = new CheckoutPage(page);
+
+    await cartPage.removeItemByName(products.backpack.name);
+    await cartPage.removeItemByName(products.bikeLight.name);
+    await expect(page.locator(".cart_item")).toHaveCount(0);
+
+    await cartPage.clickCheckout();
+    await checkoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
+    await checkoutPage.clickContinue();
+    await page.waitForURL(/checkout-step-two\.html/, { timeout: 15000 });
+    await checkoutPage.clickFinish();
+    await expect(checkoutPage.confirmationMessage).toContainText("Thank you for your order!");
+  });
+
   test("deve esvaziar o carrinho após finalizar o checkout", async ({ page }) => {
     const cartPage = new CartPage(page);
     const checkoutPage = new CheckoutPage(page);
