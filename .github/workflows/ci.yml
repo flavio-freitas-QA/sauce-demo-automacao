@@ -40,6 +40,13 @@ jobs:
         with:
           name: cypress-screenshots
           path: cypress/screenshots
+      - name: Upload de relatório HTML do Cypress (mochawesome)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-report
+          path: cypress/reports
+          retention-days: 14
 
   playwright:
     name: Playwright E2E

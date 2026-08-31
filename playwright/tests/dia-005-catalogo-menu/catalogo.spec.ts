@@ -1,5 +1,4 @@
-import { test, expect } from "@playwright/test";
-import { LoginPage } from "../../pages/LoginPage";
+import { test, expect } from "../../support/fixtures";
 import { InventoryPage } from "../../pages/InventoryPage";
 import { ProductDetailPage } from "../../pages/ProductDetailPage";
 import users from "../../fixtures/users.json";
@@ -8,10 +7,8 @@ import products from "../../fixtures/products.json";
 const sortedAsc = <T extends string | number>(values: T[]) => [...values].sort((a, b) => (a > b ? 1 : a < b ? -1 : 0));
 
 test.describe("Dia 005 - Catalogo e Menu | Sauce Demo | Ordenacao", () => {
-  test.beforeEach(async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.login(users.standard.username, users.standard.password);
-    await expect(page).toHaveURL(/inventory\.html/);
+  test.beforeEach(async ({ loginAs }) => {
+    await loginAs(users.standard.username);
   });
 
   test("deve ordenar produtos por nome A-Z", async ({ page }) => {
@@ -59,10 +56,8 @@ test.describe("Dia 005 - Catalogo e Menu | Sauce Demo | Ordenacao", () => {
 });
 
 test.describe("Dia 005 - Catalogo e Menu | Sauce Demo | Detalhe do Produto", () => {
-  test.beforeEach(async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.login(users.standard.username, users.standard.password);
-    await expect(page).toHaveURL(/inventory\.html/);
+  test.beforeEach(async ({ loginAs }) => {
+    await loginAs(users.standard.username);
   });
 
   test("deve exibir detalhes corretos ao clicar em um produto e voltar ao catalogo", async ({ page }) => {
@@ -77,7 +72,7 @@ test.describe("Dia 005 - Catalogo e Menu | Sauce Demo | Detalhe do Produto", () 
 
     await productDetailPage.clickBackToProducts();
     await expect(page).toHaveURL(/inventory\.html/);
-    await expect(page.locator(".inventory_list")).toBeVisible();
+    await expect(inventoryPage.list).toBeVisible();
   });
 
   test("deve adicionar e remover item pela pagina de detalhe do produto", async ({ page }) => {
@@ -98,10 +93,8 @@ test.describe("Dia 005 - Catalogo e Menu | Sauce Demo | Detalhe do Produto", () 
 });
 
 test.describe("Dia 005 - Catalogo e Menu | Sauce Demo | Footer", () => {
-  test.beforeEach(async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.login(users.standard.username, users.standard.password);
-    await expect(page).toHaveURL(/inventory\.html/);
+  test.beforeEach(async ({ loginAs }) => {
+    await loginAs(users.standard.username);
   });
 
   test("deve conter links de redes sociais com href correto", async ({ page }) => {
@@ -115,7 +108,7 @@ test.describe("Dia 005 - Catalogo e Menu | Sauce Demo | Footer", () => {
     await expect(inventoryPage.footerLinks()).toHaveCount(expectedLinks.length);
 
     for (const expected of expectedLinks) {
-      const link = page.locator(".footer a").filter({ hasText: expected.label });
+      const link = inventoryPage.footerLinks().filter({ hasText: expected.label });
       await expect(link).toHaveAttribute("href", expected.href);
       await expect(link).toHaveAttribute("target", "_blank");
     }

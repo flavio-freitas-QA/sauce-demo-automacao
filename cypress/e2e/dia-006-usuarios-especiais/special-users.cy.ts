@@ -1,41 +1,36 @@
-import LoginPage from "../../support/pages/LoginPage";
 import InventoryPage from "../../support/pages/InventoryPage";
 import CartPage from "../../support/pages/CartPage";
 import CheckoutPage from "../../support/pages/CheckoutPage";
 import ProductDetailPage from "../../support/pages/ProductDetailPage";
+import users from "../../fixtures/users.json";
+import products from "../../fixtures/products.json";
 
-let users: any;
-let products: any;
+const USERS_TO_TEST = ["problem", "errorUser", "visualUser"] as const;
 
-const USERS_TO_TEST = ["problem", "errorUser", "visualUser"];
+const userLabel = (userKey: (typeof USERS_TO_TEST)[number]) =>
+  userKey === "errorUser" ? "error_user" : userKey === "visualUser" ? "visual_user" : userKey;
 
 describe("Dia 006 - Usuários Especiais | Sauce Demo", () => {
-  before(() => {
-    cy.fixture("users").then((u) => {
-      users = u;
-      return cy.fixture("products");
-    }).then((p) => {
-      products = p;
-    });
-  });
-
   USERS_TO_TEST.forEach((userKey) => {
-    const userLabel = userKey === "errorUser" ? "error_user" : userKey === "visualUser" ? "visual_user" : userKey;
+    const label = userLabel(userKey);
 
-    describe(`Fluxo com ${userLabel}`, () => {
+    describe(`Fluxo com ${label}`, () => {
       beforeEach(() => {
-        LoginPage.login(users[userKey].username, users[userKey].password);
-        cy.location("pathname", { timeout: 15000 }).should("include", "/inventory.html");
+        // error_user e problem_user disparam exceções de JS propositais;
+        // o handler escopado evita que esses erros conhecidos derrubem o teste
+        // sem esconder erros nos demais specs da suíte.
+        cy.on("uncaught:exception", () => false);
+        cy.login(users[userKey].username);
       });
 
-      it(`${userLabel} - deve fazer login e exibir o catálogo`, () => {
-        cy.get(".inventory_list", { timeout: 10000 }).should("be.visible");
-        cy.get(".title").should("contain.text", "Products");
-        cy.get(".inventory_item").should("have.length.at.least", 1);
+      it(`${label} - deve exibir o catálogo ao autenticar`, () => {
+        cy.get("[data-test='inventory-list']", { timeout: 10000 }).should("be.visible");
+        cy.get("[data-test='title']").should("contain.text", "Products");
+        cy.get("[data-test='inventory-item']").should("have.length.at.least", 1);
       });
 
       if (userKey === "visualUser") {
-        it(`${userLabel} - deve adicionar e remover item no carrinho`, () => {
+        it(`${label} - deve adicionar e remover item no carrinho`, () => {
           const product = products.backpack;
 
           InventoryPage.addProductByName(product.name);
@@ -45,7 +40,7 @@ describe("Dia 006 - Usuários Especiais | Sauce Demo", () => {
           InventoryPage.getCartBadgeCount().should("eq", 0);
         });
       } else {
-        it(`${userLabel} - [BUG CONHECIDO] adiciona item mas não consegue remover`, () => {
+        it(`${label} - [BUG CONHECIDO] adiciona item mas não consegue remover`, () => {
           const product = products.backpack;
 
           InventoryPage.addProductByName(product.name);
@@ -57,47 +52,35 @@ describe("Dia 006 - Usuários Especiais | Sauce Demo", () => {
         });
       }
 
-      if (userKey === "visualUser") {
-        it(`${userLabel} - deve navegar para o detalhe do produto e voltar`, () => {
-          const product = products.backpack;
-
-          InventoryPage.clickProductByName(product.name);
-          cy.url().should("include", "/inventory-item.html");
-          cy.get(".inventory_details_name").should("contain.text", product.name);
-
-          ProductDetailPage.clickBackToProducts();
-          cy.url().should("include", "/inventory.html");
-          cy.get(".inventory_list").should("be.visible");
-        });
-      } else if (userKey === "errorUser") {
-        it(`${userLabel} - deve navegar para o detalhe do produto e voltar`, () => {
-          const product = products.backpack;
-
-          InventoryPage.clickProductByName(product.name);
-          cy.url().should("include", "/inventory-item.html");
-          cy.get(".inventory_details_name").should("contain.text", product.name);
-
-          ProductDetailPage.clickBackToProducts();
-          cy.url().should("include", "/inventory.html");
-          cy.get(".inventory_list").should("be.visible");
-        });
-      } else {
-        it(`${userLabel} - [BUG CONHECIDO] ao clicar no produto exibe o produto errado`, () => {
+      if (userKey === "problem") {
+        it(`${label} - [BUG CONHECIDO] ao clicar no produto exibe o produto errado`, () => {
           const product = products.backpack;
 
           InventoryPage.clickProductByName(product.name);
           cy.url().should("include", "/inventory-item.html");
           // Bug conhecido: problem_user vê imagem/nome de outro produto
-          cy.get(".inventory_details_name").should("not.contain.text", product.name);
+          ProductDetailPage.getProductName().should("not.contain.text", product.name);
+        });
+      } else {
+        it(`${label} - deve navegar para o detalhe do produto e voltar`, () => {
+          const product = products.backpack;
+
+          InventoryPage.clickProductByName(product.name);
+          cy.url().should("include", "/inventory-item.html");
+          ProductDetailPage.getProductName().should("contain.text", product.name);
+
+          ProductDetailPage.clickBackToProducts();
+          cy.url().should("include", "/inventory.html");
+          cy.get("[data-test='inventory-list']").should("be.visible");
         });
       }
 
       if (userKey === "visualUser") {
-        it(`${userLabel} - deve completar o fluxo de checkout`, () => {
+        it(`${label} - deve completar o fluxo de checkout`, () => {
           const product = products.backpack;
 
           InventoryPage.addProductByName(product.name);
-          cy.visit("/cart.html", { failOnStatusCode: false });
+          InventoryPage.openCart();
           CartPage.clickCheckout();
           CheckoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
           CheckoutPage.clickContinue();
@@ -106,25 +89,25 @@ describe("Dia 006 - Usuários Especiais | Sauce Demo", () => {
           CheckoutPage.getConfirmationMessage().should("be.visible");
         });
       } else if (userKey === "errorUser") {
-        it(`${userLabel} - [BUG CONHECIDO] checkout falha na tela de confirmação`, () => {
+        it(`${label} - [BUG CONHECIDO] checkout falha na tela de confirmação`, () => {
           const product = products.backpack;
 
           InventoryPage.addProductByName(product.name);
-          cy.visit("/cart.html", { failOnStatusCode: false });
+          InventoryPage.openCart();
           CartPage.clickCheckout();
           CheckoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
           CheckoutPage.clickContinue();
           cy.location("pathname", { timeout: 15000 }).should("include", "/checkout-step-two.html");
           CheckoutPage.clickFinish();
           // Bug conhecido: error_user não vê a mensagem de confirmação
-          cy.get(".checkout_complete_container").should("not.exist");
+          cy.get("[data-test='checkout-complete-container']").should("not.exist");
         });
       } else {
-        it(`${userLabel} - [BUG CONHECIDO] checkout trava na etapa 1 (não avança)`, () => {
+        it(`${label} - [BUG CONHECIDO] checkout trava na etapa 1 (não avança)`, () => {
           const product = products.backpack;
 
           InventoryPage.addProductByName(product.name);
-          cy.visit("/cart.html", { failOnStatusCode: false });
+          InventoryPage.openCart();
           CartPage.clickCheckout();
           CheckoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
           CheckoutPage.clickContinue();

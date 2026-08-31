@@ -1,5 +1,4 @@
-import { test, expect } from "@playwright/test";
-import { LoginPage } from "../../pages/LoginPage";
+import { test, expect } from "../../support/fixtures";
 import { InventoryPage } from "../../pages/InventoryPage";
 import { CartPage } from "../../pages/CartPage";
 import { CheckoutPage } from "../../pages/CheckoutPage";
@@ -12,23 +11,29 @@ const usersToTest = ["problem", "errorUser", "visualUser"] as const;
 const userLabel = (userKey: (typeof usersToTest)[number]) =>
   userKey === "errorUser" ? "error_user" : userKey === "visualUser" ? "visual_user" : userKey;
 
+// Anotação padrão para os testes que documentam bugs propositais do site;
+// aparece no relatório HTML junto ao teste.
+const annotateKnownBug = (description: string) =>
+  test.info().annotations.push({ type: "known-bug", description });
+
 test.describe("Dia 006 - Usuarios Especiais | Sauce Demo", () => {
   for (const userKey of usersToTest) {
-    test.describe(`Fluxo com ${userLabel(userKey)}`, () => {
-      test.beforeEach(async ({ page }) => {
-        const loginPage = new LoginPage(page);
-        await loginPage.login(users[userKey].username, users[userKey].password);
-        await expect(page).toHaveURL(/inventory\.html/);
+    const label = userLabel(userKey);
+
+    test.describe(`Fluxo com ${label}`, () => {
+      test.beforeEach(async ({ loginAs }) => {
+        await loginAs(users[userKey].username);
       });
 
-      test(`${userLabel(userKey)} - deve fazer login e exibir o catalogo`, async ({ page }) => {
-        await expect(page.locator(".inventory_list")).toBeVisible({ timeout: 10000 });
-        await expect(page.locator(".title")).toContainText("Products");
-        await expect(page.locator(".inventory_item").first()).toBeVisible();
+      test(`${label} - deve exibir o catalogo ao autenticar`, async ({ page }) => {
+        const inventoryPage = new InventoryPage(page);
+        await expect(inventoryPage.list).toBeVisible({ timeout: 10000 });
+        await expect(page.locator("[data-test='title']")).toContainText("Products");
+        await expect(page.locator("[data-test='inventory-item']").first()).toBeVisible();
       });
 
       if (userKey === "visualUser") {
-        test(`${userLabel(userKey)} - deve adicionar e remover item no carrinho`, async ({ page }) => {
+        test(`${label} - deve adicionar e remover item no carrinho`, async ({ page }) => {
           const inventoryPage = new InventoryPage(page);
 
           await inventoryPage.addProductByName(products.backpack.name);
@@ -38,7 +43,8 @@ test.describe("Dia 006 - Usuarios Especiais | Sauce Demo", () => {
           await expect.poll(() => inventoryPage.getCartBadgeCount()).toBe(0);
         });
       } else {
-        test(`${userLabel(userKey)} - [BUG CONHECIDO] adiciona item mas nao consegue remover`, async ({ page }) => {
+        test(`${label} - [BUG CONHECIDO] adiciona item mas nao consegue remover`, async ({ page }) => {
+          annotateKnownBug(`${label} adiciona item ao carrinho mas o botão Remove não funciona`);
           const inventoryPage = new InventoryPage(page);
 
           await inventoryPage.addProductByName(products.backpack.name);
@@ -50,15 +56,17 @@ test.describe("Dia 006 - Usuarios Especiais | Sauce Demo", () => {
       }
 
       if (userKey === "problem") {
-        test(`${userLabel(userKey)} - [BUG CONHECIDO] ao clicar no produto exibe o produto errado`, async ({ page }) => {
+        test(`${label} - [BUG CONHECIDO] ao clicar no produto exibe o produto errado`, async ({ page }) => {
+          annotateKnownBug("problem_user vê imagem/nome de outro produto na página de detalhe");
           const inventoryPage = new InventoryPage(page);
+          const productDetailPage = new ProductDetailPage(page);
 
           await inventoryPage.clickProductByName(products.backpack.name);
           await expect(page).toHaveURL(/inventory-item\.html/);
-          await expect(page.locator(".inventory_details_name")).not.toContainText(products.backpack.name);
+          await expect(productDetailPage.productName).not.toContainText(products.backpack.name);
         });
       } else {
-        test(`${userLabel(userKey)} - deve navegar para o detalhe do produto e voltar`, async ({ page }) => {
+        test(`${label} - deve navegar para o detalhe do produto e voltar`, async ({ page }) => {
           const inventoryPage = new InventoryPage(page);
           const productDetailPage = new ProductDetailPage(page);
 
@@ -68,18 +76,18 @@ test.describe("Dia 006 - Usuarios Especiais | Sauce Demo", () => {
 
           await productDetailPage.clickBackToProducts();
           await expect(page).toHaveURL(/inventory\.html/);
-          await expect(page.locator(".inventory_list")).toBeVisible();
+          await expect(inventoryPage.list).toBeVisible();
         });
       }
 
       if (userKey === "visualUser") {
-        test(`${userLabel(userKey)} - deve completar o fluxo de checkout`, async ({ page }) => {
+        test(`${label} - deve completar o fluxo de checkout`, async ({ page }) => {
           const inventoryPage = new InventoryPage(page);
           const cartPage = new CartPage(page);
           const checkoutPage = new CheckoutPage(page);
 
           await inventoryPage.addProductByName(products.backpack.name);
-          await cartPage.goto();
+          await inventoryPage.openCart();
           await cartPage.clickCheckout();
           await checkoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
           await checkoutPage.clickContinue();
@@ -88,28 +96,30 @@ test.describe("Dia 006 - Usuarios Especiais | Sauce Demo", () => {
           await expect(checkoutPage.confirmationMessage).toBeVisible();
         });
       } else if (userKey === "errorUser") {
-        test(`${userLabel(userKey)} - [BUG CONHECIDO] checkout falha na tela de confirmacao`, async ({ page }) => {
+        test(`${label} - [BUG CONHECIDO] checkout falha na tela de confirmacao`, async ({ page }) => {
+          annotateKnownBug("error_user finaliza o checkout mas não vê a confirmação do pedido");
           const inventoryPage = new InventoryPage(page);
           const cartPage = new CartPage(page);
           const checkoutPage = new CheckoutPage(page);
 
           await inventoryPage.addProductByName(products.backpack.name);
-          await cartPage.goto();
+          await inventoryPage.openCart();
           await cartPage.clickCheckout();
           await checkoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
           await checkoutPage.clickContinue();
           await expect(page).toHaveURL(/checkout-step-two\.html/);
           await checkoutPage.clickFinish();
-          await expect(page.locator(".checkout_complete_container")).toHaveCount(0);
+          await expect(page.locator("[data-test='checkout-complete-container']")).toHaveCount(0);
         });
       } else {
-        test(`${userLabel(userKey)} - [BUG CONHECIDO] checkout trava na etapa 1 (nao avanca)`, async ({ page }) => {
+        test(`${label} - [BUG CONHECIDO] checkout trava na etapa 1 (nao avanca)`, async ({ page }) => {
+          annotateKnownBug("problem_user não consegue avançar da etapa 1 do checkout (Last Name não é preenchido)");
           const inventoryPage = new InventoryPage(page);
           const cartPage = new CartPage(page);
           const checkoutPage = new CheckoutPage(page);
 
           await inventoryPage.addProductByName(products.backpack.name);
-          await cartPage.goto();
+          await inventoryPage.openCart();
           await cartPage.clickCheckout();
           await checkoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
           await checkoutPage.clickContinue();

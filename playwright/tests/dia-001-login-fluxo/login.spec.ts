@@ -8,7 +8,7 @@ test.describe("Dia 001 - Fluxo de Login | Sauce Demo (Playwright)", () => {
     const loginPage = new LoginPage(page);
     await loginPage.login(users.standard.username, users.standard.password);
     await expect(page).toHaveURL(/inventory.html/);
-    await expect(page.locator(".title")).toHaveText("Products");
+    await expect(page.locator("[data-test='title']")).toHaveText("Products");
   });
 
   test("deve exibir erro ao tentar logar com senha inválida", async ({ page }) => {

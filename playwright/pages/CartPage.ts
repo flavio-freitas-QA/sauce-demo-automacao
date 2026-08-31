@@ -1,18 +1,21 @@
 import { Page, Locator } from "@playwright/test";
 
+// Nota: os itens do carrinho recebem data-test="inventory-item" (mesmo valor
+// usado no catálogo), então a classe .cart_item continua sendo o seletor mais
+// expressivo para o item dentro desta página.
 export class CartPage {
   readonly page: Page;
   readonly items: Locator;
+  readonly title: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.items = page.locator(".cart_item");
+    this.title = page.locator("[data-test='title']");
   }
 
   async goto() {
-    await this.page.goto("/cart.html", { waitUntil: "domcontentloaded" }).catch(() => undefined);
-    await this.page.waitForLoadState("networkidle", { timeout: 30000 }).catch(() => undefined);
-    await this.page.locator("body").waitFor({ timeout: 30000 });
+    await this.page.goto("/cart.html");
   }
 
   getItemByName(name: string) {
@@ -20,11 +23,11 @@ export class CartPage {
   }
 
   async getItemName(name: string) {
-    return this.getItemByName(name).locator(".inventory_item_name").textContent();
+    return this.getItemByName(name).locator("[data-test='inventory-item-name']").textContent();
   }
 
   async getItemPrice(name: string) {
-    return this.getItemByName(name).locator(".inventory_item_price").textContent();
+    return this.getItemByName(name).locator("[data-test='inventory-item-price']").textContent();
   }
 
   async removeItemByName(name: string) {
@@ -32,10 +35,10 @@ export class CartPage {
   }
 
   async clickContinueShopping() {
-    await this.page.getByRole("button", { name: /Continue Shopping/i }).click();
+    await this.page.locator("[data-test='continue-shopping']").click();
   }
 
   async clickCheckout() {
-    await this.page.getByRole("button", { name: /Checkout/i }).click();
+    await this.page.locator("[data-test='checkout']").click();
   }
 }

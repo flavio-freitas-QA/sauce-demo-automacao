@@ -1,30 +1,35 @@
+// Page Object da página de detalhe do produto.
+// Os data-test de nome/descrição/preço são os mesmos do catálogo
+// (inventory-item-name/desc/price), o que unifica os seletores entre telas.
 class ProductDetailPage {
   getProductName() {
-    return cy.get(".inventory_details_name");
+    return cy.get("[data-test='inventory-item-name']");
   }
 
   getProductDescription() {
-    return cy.get(".inventory_details_desc");
+    return cy.get("[data-test='inventory-item-desc']");
   }
 
   getProductPrice() {
-    return cy.get(".inventory_details_price");
+    return cy.get("[data-test='inventory-item-price']");
   }
 
   getActionButton() {
+    // O botão alterna entre data-test='add-to-cart' e 'remove' conforme o
+    // estado, então o container é o seletor estável para ler o rótulo atual.
     return cy.get(".inventory_details_container button");
   }
 
   addToCart() {
-    this.getActionButton().contains(/Add to cart/i).click();
+    cy.get("[data-test='add-to-cart']").click();
   }
 
   removeFromCart() {
-    this.getActionButton().contains(/Remove/i).click();
+    cy.get("[data-test='remove']").click();
   }
 
   clickBackToProducts() {
-    cy.contains("button", /Back to products/i).click();
+    cy.get("[data-test='back-to-products']").click();
   }
 
   validateProductName(expected: string) {

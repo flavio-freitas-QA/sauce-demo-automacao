@@ -1,6 +1,15 @@
 import { defineConfig } from "cypress";
 
 export default defineConfig({
+  reporter: "cypress-mochawesome-reporter",
+  reporterOptions: {
+    reportDir: "cypress/reports",
+    reportPageTitle: "Sauce Demo - Cypress",
+    charts: true,
+    embeddedScreenshots: true,
+    inlineAssets: true,
+    saveAllAttempts: false,
+  },
   e2e: {
     baseUrl: "https://www.saucedemo.com",
     supportFile: "cypress/support/e2e.ts",
@@ -16,7 +25,7 @@ export default defineConfig({
       openMode: 0,
     },
     setupNodeEvents(on, config) {
-      // hook para plugins futuros (ex: relatórios, tasks customizadas)
+      require("cypress-mochawesome-reporter/plugin")(on);
       return config;
     },
   },

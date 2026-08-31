@@ -24,11 +24,11 @@ export class CheckoutPage {
     this.cancelButton = page.locator("[data-test='cancel']");
     this.finishButton = page.locator("[data-test='finish']");
     this.backHomeButton = page.locator("[data-test='back-to-products']");
-    this.confirmationMessage = page.locator("h2").filter({ hasText: "Thank you for your order!" });
+    this.confirmationMessage = page.locator("[data-test='complete-header']");
     this.errorMessage = page.locator("[data-test='error']");
-    this.itemTotal = page.locator(".summary_subtotal_label");
-    this.tax = page.locator(".summary_tax_label");
-    this.total = page.locator(".summary_total_label");
+    this.itemTotal = page.locator("[data-test='subtotal-label']");
+    this.tax = page.locator("[data-test='tax-label']");
+    this.total = page.locator("[data-test='total-label']");
   }
 
   async fillCustomerInfo(firstName: string, lastName: string, postalCode: string) {

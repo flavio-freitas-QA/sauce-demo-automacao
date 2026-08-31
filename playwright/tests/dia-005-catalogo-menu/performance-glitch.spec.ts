@@ -4,6 +4,8 @@ import { InventoryPage } from "../../pages/InventoryPage";
 import users from "../../fixtures/users.json";
 import products from "../../fixtures/products.json";
 
+// Este spec mantém o login pela UI de propósito: o objetivo é observar o
+// comportamento (e o tempo) do fluxo real com o atraso do performance_glitch_user.
 test.describe("Dia 005 - Catalogo e Menu | Sauce Demo | Performance Glitch", () => {
   test("deve fazer login com performance_glitch_user e o fluxo de adicionar ao carrinho deve funcionar", async ({ page }) => {
     const loginPage = new LoginPage(page);
@@ -11,8 +13,8 @@ test.describe("Dia 005 - Catalogo e Menu | Sauce Demo | Performance Glitch", () 
 
     await loginPage.login(users.performanceGlitch.username, users.performanceGlitch.password);
     await expect(page).toHaveURL(/inventory\.html/, { timeout: 30000 });
-    await expect(page.locator(".inventory_list")).toBeVisible({ timeout: 20000 });
-    await expect(page.locator(".title")).toContainText("Products");
+    await expect(inventoryPage.list).toBeVisible({ timeout: 20000 });
+    await expect(page.locator("[data-test='title']")).toContainText("Products");
 
     await inventoryPage.addProductByName(products.backpack.name);
     await expect.poll(() => inventoryPage.getCartBadgeCount()).toBe(1);
@@ -21,11 +23,12 @@ test.describe("Dia 005 - Catalogo e Menu | Sauce Demo | Performance Glitch", () 
 
   test("deve medir o tempo aproximado de carregamento da pagina de inventario", async ({ page }) => {
     const loginPage = new LoginPage(page);
+    const inventoryPage = new InventoryPage(page);
     const startedAt = Date.now();
 
     await loginPage.login(users.performanceGlitch.username, users.performanceGlitch.password);
     await expect(page).toHaveURL(/inventory\.html/, { timeout: 30000 });
-    await expect(page.locator(".inventory_list")).toBeVisible({ timeout: 20000 });
+    await expect(inventoryPage.list).toBeVisible({ timeout: 20000 });
 
     const elapsed = Date.now() - startedAt;
     test.info().annotations.push({ type: "load-time-ms", description: String(elapsed) });

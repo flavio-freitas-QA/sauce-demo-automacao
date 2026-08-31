@@ -1,26 +1,18 @@
 import LoginPage from "../../support/pages/LoginPage";
 import InventoryPage from "../../support/pages/InventoryPage";
+import users from "../../fixtures/users.json";
+import products from "../../fixtures/products.json";
 
-let users: any;
-let products: any;
-
+// Este spec mantém o login pela UI de propósito: o objetivo é observar o
+// comportamento (e o tempo) do fluxo real com o atraso do performance_glitch_user.
 describe("Dia 005 - Catálogo e Menu | Sauce Demo | Performance Glitch", () => {
-  beforeEach(() => {
-    cy.fixture("users").then((userData) => {
-      users = userData;
-      return cy.fixture("products");
-    }).then((productData) => {
-      products = productData;
-    });
-  });
-
   it("deve fazer login com performance_glitch_user e o fluxo de adicionar ao carrinho deve funcionar", () => {
     const product = products.backpack;
 
     LoginPage.login(users.performanceGlitch.username, users.performanceGlitch.password);
     cy.location("pathname", { timeout: 30000 }).should("include", "/inventory.html");
-    cy.get(".inventory_list", { timeout: 20000 }).should("be.visible");
-    cy.get(".title").should("contain.text", "Products");
+    cy.get("[data-test='inventory-list']", { timeout: 20000 }).should("be.visible");
+    cy.get("[data-test='title']").should("contain.text", "Products");
 
     InventoryPage.addProductByName(product.name);
     InventoryPage.getCartBadgeCount().should("eq", 1);
@@ -36,7 +28,7 @@ describe("Dia 005 - Catálogo e Menu | Sauce Demo | Performance Glitch", () => {
     LoginPage.submit();
 
     cy.location("pathname", { timeout: 30000 }).should("include", "/inventory.html");
-    cy.get(".inventory_list", { timeout: 20000 }).should("be.visible");
+    cy.get("[data-test='inventory-list']", { timeout: 20000 }).should("be.visible");
 
     cy.then(() => {
       const elapsed = Date.now() - t0;

@@ -1,11 +1,14 @@
+// Page Object da tela de inventário (catálogo) do Sauce Demo.
+// Seletores priorizam os atributos data-test expostos pela aplicação.
 class InventoryPage {
   visit() {
-    cy.visit("/");
-    cy.get(".inventory_list", { timeout: 20000 }).should("be.visible");
+    // failOnStatusCode: o site responde status 404 para subrotas do SPA.
+    cy.visit("/inventory.html", { failOnStatusCode: false });
+    cy.get("[data-test='inventory-list']", { timeout: 20000 }).should("be.visible");
   }
 
   openCart() {
-    cy.get(".shopping_cart_link").click();
+    cy.get("[data-test='shopping-cart-link']").click();
   }
 
   addProductByName(name: string) {
@@ -21,15 +24,15 @@ class InventoryPage {
   }
 
   getProductCard(name: string) {
-    return cy.contains(".inventory_item", name);
+    return cy.contains("[data-test='inventory-item']", name);
   }
 
   getProductName(name: string) {
-    return this.getProductCard(name).find(".inventory_item_name");
+    return this.getProductCard(name).find("[data-test='inventory-item-name']");
   }
 
   getProductPrice(name: string) {
-    return this.getProductCard(name).find(".inventory_item_price");
+    return this.getProductCard(name).find("[data-test='inventory-item-price']");
   }
 
   getProductActionButton(name: string) {
@@ -38,28 +41,30 @@ class InventoryPage {
 
   getCartBadgeCount() {
     return cy.get("body").then(($body) => {
-      const badge = $body.find(".shopping_cart_badge");
+      const badge = $body.find("[data-test='shopping-cart-badge']");
       return badge.length ? Number(badge.text().trim()) : 0;
     });
   }
 
   sortProducts(option: string) {
-    cy.get(".inventory_list").should("be.visible");
-    cy.get("select.product_sort_container", { timeout: 10000 }).should("be.visible").select(option);
+    cy.get("[data-test='inventory-list']").should("be.visible");
+    cy.get("[data-test='product-sort-container']", { timeout: 10000 })
+      .should("be.visible")
+      .select(option);
   }
 
   clickProductByName(name: string) {
-    this.getProductCard(name).find(".inventory_item_name").click();
+    this.getProductCard(name).find("[data-test='inventory-item-name']").click();
   }
 
   getAllProductNames() {
-    return cy.get(".inventory_item_name").then(($names) => {
+    return cy.get("[data-test='inventory-item-name']").then(($names) => {
       return Cypress._.map($names, (el) => el.innerText.trim());
     });
   }
 
   getAllProductPrices() {
-    return cy.get(".inventory_item_price").then(($prices) => {
+    return cy.get("[data-test='inventory-item-price']").then(($prices) => {
       return Cypress._.map($prices, (el) => {
         return parseFloat(el.innerText.replace("$", "").trim());
       });
@@ -67,7 +72,7 @@ class InventoryPage {
   }
 
   getFooterLinks() {
-    return cy.get(".footer a");
+    return cy.get("[data-test='footer'] a");
   }
 }
 

@@ -29,6 +29,7 @@ Demonstrar, de forma prática e contínua, domínio em:
 | 004 | Postman/Newman | APIs públicas JSONPlaceholder e ReqRes | Collections, environments, contratos e cenários negativos |
 | 005 | Cypress + Playwright | Catálogo, menu lateral e performance | Ordenação, detalhe do produto, footer, reset/logout/about e `performance_glitch_user` |
 | 006 | Cypress + Playwright | Usuários especiais (Sauce Demo) | `problem_user`, `error_user`, `visual_user` e bugs conhecidos documentados |
+| 007 | Cypress + Playwright | Refatoração da suíte | Login programático (`cy.session` / fixture `loginAs`), seletores `data-test`, fixtures tipadas, relatório mochawesome |
 
 > Tabela atualizada a cada novo dia. Detalhes de cada entrada em [`docs/`](./docs).
 
@@ -54,6 +55,7 @@ sauce-demo-automacao/
 ├── playwright/
 │   ├── tests/                 # specs organizados por dia
 │   ├── pages/                  # Page Objects
+│   ├── support/                # fixtures customizadas (ex: loginAs)
 │   └── fixtures/
 ├── postman/
 │   ├── collections/            # collections por dia de API
@@ -94,7 +96,7 @@ Todo push/PR para `main` dispara automaticamente:
 3. Suíte Playwright (Chromium + Firefox)
 4. Testes de API (Newman)
 
-Relatórios do Playwright e screenshots de falhas do Cypress ficam disponíveis como artifacts do workflow.
+Relatórios do Playwright, relatório HTML do Cypress (mochawesome) e screenshots de falhas ficam disponíveis como artifacts do workflow.
 
 ## 👤 Autor
 

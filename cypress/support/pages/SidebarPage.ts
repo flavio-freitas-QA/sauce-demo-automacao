@@ -1,5 +1,9 @@
+// Page Object do menu lateral (burger menu) do Sauce Demo.
+// O wrapper .bm-menu-wrap vem da lib react-burger-menu e não possui data-test.
 class SidebarPage {
   openMenu() {
+    // Os data-test open-menu/close-menu ficam no <img> do ícone, mas quem
+    // recebe o clique é o <button> da lib react-burger-menu — por isso o id.
     cy.get("#react-burger-menu-btn").click();
     cy.get(".bm-menu-wrap", { timeout: 5000 }).should("be.visible");
   }
@@ -9,20 +13,36 @@ class SidebarPage {
     cy.get(".bm-menu-wrap", { timeout: 5000 }).should("not.be.visible");
   }
 
+  getAllItemsLink() {
+    return cy.get("[data-test='inventory-sidebar-link']");
+  }
+
+  getAboutLink() {
+    return cy.get("[data-test='about-sidebar-link']");
+  }
+
+  getLogoutLink() {
+    return cy.get("[data-test='logout-sidebar-link']");
+  }
+
+  getResetAppStateLink() {
+    return cy.get("[data-test='reset-sidebar-link']");
+  }
+
   clickAllItems() {
-    cy.get("#inventory_sidebar_link").click();
+    this.getAllItemsLink().click();
   }
 
   clickAbout() {
-    cy.get("#about_sidebar_link").click();
+    this.getAboutLink().click();
   }
 
   clickResetAppState() {
-    cy.get("#reset_sidebar_link").click();
+    this.getResetAppStateLink().click();
   }
 
   clickLogout() {
-    cy.get("#logout_sidebar_link").click();
+    this.getLogoutLink().click();
   }
 }
 

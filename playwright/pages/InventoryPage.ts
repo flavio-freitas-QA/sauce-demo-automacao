@@ -3,18 +3,21 @@ import { Page, Locator } from "@playwright/test";
 export class InventoryPage {
   readonly page: Page;
   readonly cartLink: Locator;
+  readonly cartBadge: Locator;
   readonly sortDropdown: Locator;
+  readonly list: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.cartLink = page.locator(".shopping_cart_link");
-    this.sortDropdown = page.locator("select.product_sort_container");
+    this.cartLink = page.locator("[data-test='shopping-cart-link']");
+    this.cartBadge = page.locator("[data-test='shopping-cart-badge']");
+    this.sortDropdown = page.locator("[data-test='product-sort-container']");
+    this.list = page.locator("[data-test='inventory-list']");
   }
 
   async goto() {
-    await this.page.goto("/inventory.html", { waitUntil: "domcontentloaded" });
-    await this.page.waitForLoadState("networkidle", { timeout: 30000 }).catch(() => undefined);
-    await this.page.locator("body").waitFor({ timeout: 30000 });
+    await this.page.goto("/inventory.html");
+    await this.list.waitFor({ timeout: 30000 });
   }
 
   async openCart() {
@@ -22,7 +25,7 @@ export class InventoryPage {
   }
 
   getProductCard(name: string) {
-    return this.page.locator(".inventory_item").filter({ hasText: name }).first();
+    return this.page.locator("[data-test='inventory-item']").filter({ hasText: name }).first();
   }
 
   async addProductByName(name: string) {
@@ -36,11 +39,11 @@ export class InventoryPage {
   }
 
   async getProductName(name: string) {
-    return this.getProductCard(name).locator(".inventory_item_name").textContent();
+    return this.getProductCard(name).locator("[data-test='inventory-item-name']").textContent();
   }
 
   async getProductPrice(name: string) {
-    return this.getProductCard(name).locator(".inventory_item_price").textContent();
+    return this.getProductCard(name).locator("[data-test='inventory-item-price']").textContent();
   }
 
   async getProductActionButtonText(name: string) {
@@ -48,12 +51,11 @@ export class InventoryPage {
   }
 
   async getCartBadgeCount() {
-    const badge = this.page.locator(".shopping_cart_badge");
-    if ((await badge.count()) === 0) {
+    if ((await this.cartBadge.count()) === 0) {
       return 0;
     }
 
-    return Number((await badge.textContent())?.trim());
+    return Number((await this.cartBadge.textContent())?.trim());
   }
 
   async sortProducts(option: string) {
@@ -61,22 +63,22 @@ export class InventoryPage {
   }
 
   async clickProductByName(name: string) {
-    await this.getProductCard(name).locator(".inventory_item_name").click();
+    await this.getProductCard(name).locator("[data-test='inventory-item-name']").click();
   }
 
   async getAllProductNames() {
-    return this.page.locator(".inventory_item_name").evaluateAll((elements) =>
+    return this.page.locator("[data-test='inventory-item-name']").evaluateAll((elements) =>
       elements.map((element) => element.textContent?.trim() || ""),
     );
   }
 
   async getAllProductPrices() {
-    return this.page.locator(".inventory_item_price").evaluateAll((elements) =>
+    return this.page.locator("[data-test='inventory-item-price']").evaluateAll((elements) =>
       elements.map((element) => Number((element.textContent || "").replace("$", "").trim())),
     );
   }
 
   footerLinks() {
-    return this.page.locator(".footer a");
+    return this.page.locator("[data-test='footer'] a");
   }
 }

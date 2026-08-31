@@ -1,23 +1,11 @@
-import LoginPage from "../../support/pages/LoginPage";
 import InventoryPage from "../../support/pages/InventoryPage";
 import ProductDetailPage from "../../support/pages/ProductDetailPage";
-
-let users: any;
-let products: any;
+import users from "../../fixtures/users.json";
+import products from "../../fixtures/products.json";
 
 describe("Dia 005 - Catálogo e Menu | Sauce Demo | Ordenação", () => {
   beforeEach(() => {
-    cy.fixture("users").then((userData) => {
-      users = userData;
-      return cy.fixture("products");
-    }).then((productData) => {
-      products = productData;
-    });
-  });
-
-  beforeEach(() => {
-    LoginPage.login(users.standard.username, users.standard.password);
-    cy.location("pathname", { timeout: 15000 }).should("include", "/inventory.html");
+    cy.login(users.standard.username);
   });
 
   it("deve ordenar produtos por nome A-Z", () => {
@@ -70,17 +58,7 @@ describe("Dia 005 - Catálogo e Menu | Sauce Demo | Ordenação", () => {
 
 describe("Dia 005 - Catálogo e Menu | Sauce Demo | Detalhe do Produto", () => {
   beforeEach(() => {
-    cy.fixture("users").then((userData) => {
-      users = userData;
-      return cy.fixture("products");
-    }).then((productData) => {
-      products = productData;
-    });
-  });
-
-  beforeEach(() => {
-    LoginPage.login(users.standard.username, users.standard.password);
-    cy.location("pathname", { timeout: 15000 }).should("include", "/inventory.html");
+    cy.login(users.standard.username);
   });
 
   it("deve exibir detalhes corretos ao clicar em um produto e voltar ao catálogo", () => {
@@ -96,7 +74,7 @@ describe("Dia 005 - Catálogo e Menu | Sauce Demo | Detalhe do Produto", () => {
 
     ProductDetailPage.clickBackToProducts();
     cy.url().should("include", "/inventory.html");
-    cy.get(".inventory_list").should("be.visible");
+    cy.get("[data-test='inventory-list']").should("be.visible");
   });
 
   it("deve adicionar e remover item pela página de detalhe do produto", () => {
@@ -117,17 +95,7 @@ describe("Dia 005 - Catálogo e Menu | Sauce Demo | Detalhe do Produto", () => {
 
 describe("Dia 005 - Catálogo e Menu | Sauce Demo | Footer", () => {
   beforeEach(() => {
-    cy.fixture("users").then((userData) => {
-      users = userData;
-      return cy.fixture("products");
-    }).then((productData) => {
-      products = productData;
-    });
-  });
-
-  beforeEach(() => {
-    LoginPage.login(users.standard.username, users.standard.password);
-    cy.location("pathname", { timeout: 15000 }).should("include", "/inventory.html");
+    cy.login(users.standard.username);
   });
 
   it("deve conter links de redes sociais com href correto", () => {
@@ -137,10 +105,10 @@ describe("Dia 005 - Catálogo e Menu | Sauce Demo | Footer", () => {
       { label: "LinkedIn", href: "https://www.linkedin.com/company/sauce-labs/" },
     ];
 
-    cy.get(".footer a").should("have.length", expectedLinks.length);
+    InventoryPage.getFooterLinks().should("have.length", expectedLinks.length);
 
     expectedLinks.forEach((expected) => {
-      cy.contains(".footer a", expected.label)
+      cy.contains("[data-test='footer'] a", expected.label)
         .should("have.attr", "href", expected.href)
         .and("have.attr", "target", "_blank");
     });

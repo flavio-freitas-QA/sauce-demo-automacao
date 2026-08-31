@@ -8,7 +8,9 @@ Este repositório é um portfólio de automação de testes com Cypress, Playwri
 - Prefira Page Object Model para páginas de UI em Cypress e Playwright.
 - Mantenha testes pequenos, legíveis e determinísticos.
 - Use fixtures quando houver massa de dados; evite valores hardcoded desnecessários.
-- Organize novos arquivos por dia, seguindo a estrutura atual: cypress/e2e/day-XXX-..., playwright/tests/day-XXX-..., postman/collections/day-XXX-...
+- Organize novos arquivos por dia, seguindo a estrutura atual: cypress/e2e/dia-XXX-..., playwright/tests/dia-XXX-..., postman/collections/dia-XXX-...
+- Autenticação em fluxos que não testam o login: use cy.login (Cypress) ou a fixture loginAs (Playwright), nunca o formulário via UI.
+- Seletores: prefira os atributos data-test da aplicação; exceções documentadas nos Page Objects.
 - Documente decisões técnicas relevantes em docs/ quando adicionar um novo fluxo.
 
 ## Estrutura esperada

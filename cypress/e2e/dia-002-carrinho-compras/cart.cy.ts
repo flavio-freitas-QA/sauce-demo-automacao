@@ -1,23 +1,11 @@
-import LoginPage from "../../support/pages/LoginPage";
 import InventoryPage from "../../support/pages/InventoryPage";
 import CartPage from "../../support/pages/CartPage";
-
-let users: any;
-let products: any;
+import users from "../../fixtures/users.json";
+import products from "../../fixtures/products.json";
 
 describe("Dia 002 - Fluxo de Carrinho | Sauce Demo", () => {
   beforeEach(() => {
-    cy.fixture("users").then((userData) => {
-      users = userData;
-      return cy.fixture("products");
-    }).then((productData) => {
-      products = productData;
-    });
-  });
-
-  beforeEach(() => {
-    LoginPage.login(users.standard.username, users.standard.password);
-    cy.location("pathname", { timeout: 15000 }).should("include", "/inventory.html");
+    cy.login(users.standard.username);
   });
 
   it("deve adicionar 1 produto e atualizar o contador do carrinho", () => {
@@ -42,7 +30,7 @@ describe("Dia 002 - Fluxo de Carrinho | Sauce Demo", () => {
     });
 
     InventoryPage.getCartBadgeCount().should("eq", 6);
-    cy.visit("/cart.html", { failOnStatusCode: false });
+    InventoryPage.openCart();
     selectedProducts.forEach((product) => {
       CartPage.getItemByName(product.name).should("be.visible");
     });
@@ -63,24 +51,24 @@ describe("Dia 002 - Fluxo de Carrinho | Sauce Demo", () => {
     const product = products.backpack;
 
     InventoryPage.addProductByName(product.name);
-    cy.visit("/cart.html", { failOnStatusCode: false });
+    InventoryPage.openCart();
     CartPage.removeItemByName(product.name);
 
     CartPage.getItemByName(product.name).should("not.exist");
     InventoryPage.getCartBadgeCount().should("eq", 0);
   });
 
-  it("deve manter a tela do carrinho vazia sem quebrar", function () {
+  it("deve manter a tela do carrinho vazia sem quebrar (acesso via deep link)", () => {
     cy.visit("/cart.html", { failOnStatusCode: false });
-    cy.get(".cart_item").should("not.exist");
-    cy.contains("Your Cart").should("be.visible");
+    CartPage.getItems().should("not.exist");
+    cy.get("[data-test='title']").should("have.text", "Your Cart");
   });
 
   it("deve preservar o contador ao navegar entre inventário e carrinho", () => {
     const product = products.backpack;
 
     InventoryPage.addProductByName(product.name);
-    cy.visit("/cart.html", { failOnStatusCode: false });
+    InventoryPage.openCart();
     CartPage.clickContinueShopping();
 
     InventoryPage.getCartBadgeCount().should("eq", 1);
@@ -92,7 +80,7 @@ describe("Dia 002 - Fluxo de Carrinho | Sauce Demo", () => {
     InventoryPage.getProductName(product.name).invoke("text").then((inventoryName) => {
       InventoryPage.getProductPrice(product.name).invoke("text").then((inventoryPrice) => {
         InventoryPage.addProductByName(product.name);
-        cy.visit("/cart.html", { failOnStatusCode: false });
+        InventoryPage.openCart();
 
         CartPage.getItemName(product.name).invoke("text").then((cartName) => {
           expect(cartName.trim()).to.equal(inventoryName.trim());
@@ -109,32 +97,32 @@ describe("Dia 002 - Fluxo de Carrinho | Sauce Demo", () => {
     const product = products.backpack;
 
     InventoryPage.addProductByName(product.name);
-    cy.visit("/cart.html", { failOnStatusCode: false });
+    InventoryPage.openCart();
     CartPage.clickContinueShopping();
 
     cy.url().should("include", "/inventory.html");
-    cy.contains("Products").should("be.visible");
+    cy.get("[data-test='title']").should("contain.text", "Products");
   });
 
-  it("deve persistir o carrinho após recarregar a página (estado mantido via sessionStorage)", () => {
+  it("deve persistir o carrinho após recarregar a página", () => {
     const product = products.backpack;
 
     InventoryPage.addProductByName(product.name);
     InventoryPage.getCartBadgeCount().should("eq", 1);
 
     cy.reload();
-    cy.get(".shopping_cart_badge", { timeout: 10000 }).should("have.text", "1");
+    cy.get("[data-test='shopping-cart-badge']", { timeout: 10000 }).should("have.text", "1");
     InventoryPage.getProductActionButton(product.name).should("contain.text", "Remove");
   });
 
-  it("deve acessar o carrinho autenticado e exibir a página corretamente", () => {
+  it("deve acessar o carrinho autenticado por deep link e exibir a página corretamente", () => {
     const product = products.backpack;
 
     InventoryPage.addProductByName(product.name);
     cy.visit("/cart.html", { failOnStatusCode: false });
 
     cy.url().should("include", "/cart.html");
-    cy.contains("Your Cart").should("be.visible");
+    cy.get("[data-test='title']").should("have.text", "Your Cart");
     CartPage.getItemByName(product.name).should("be.visible");
   });
 });
@@ -149,17 +137,10 @@ describe("Dia 002 - Fluxo de Carrinho | Sauce Demo | Acesso direto", () => {
 
 describe("Dia 002 - Fluxo de Carrinho | Sauce Demo | Usuário problem", () => {
   beforeEach(() => {
-    cy.fixture("users").then((userData) => {
-      users = userData;
-      return cy.fixture("products");
-    }).then((productData) => {
-      products = productData;
-    });
-  });
-
-  beforeEach(() => {
-    LoginPage.login(users.problem.username, users.problem.password);
-    cy.location("pathname", { timeout: 15000 }).should("include", "/inventory.html");
+    // problem_user dispara erros de JS propositais; o handler escopado
+    // impede que essas exceções conhecidas derrubem o teste.
+    cy.on("uncaught:exception", () => false);
+    cy.login(users.problem.username);
   });
 
   it("deve manter o fluxo funcional do carrinho com problem_user", () => {
@@ -167,7 +148,7 @@ describe("Dia 002 - Fluxo de Carrinho | Sauce Demo | Usuário problem", () => {
 
     InventoryPage.addProductByName(product.name);
     InventoryPage.getCartBadgeCount().should("eq", 1);
-    cy.visit("/cart.html", { failOnStatusCode: false });
+    InventoryPage.openCart();
     CartPage.getItemByName(product.name).should("be.visible");
   });
 });

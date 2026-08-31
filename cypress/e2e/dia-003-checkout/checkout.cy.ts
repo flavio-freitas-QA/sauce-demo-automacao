@@ -1,29 +1,17 @@
-import LoginPage from "../../support/pages/LoginPage";
 import InventoryPage from "../../support/pages/InventoryPage";
 import CartPage from "../../support/pages/CartPage";
 import CheckoutPage from "../../support/pages/CheckoutPage";
-
-let users: any;
-let products: any;
+import users from "../../fixtures/users.json";
+import products from "../../fixtures/products.json";
 
 const parsePrice = (value: string) => Number(value.replace(/[^0-9.]/g, ""));
 
 describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
   beforeEach(() => {
-    cy.fixture("users").then((userData) => {
-      users = userData;
-      return cy.fixture("products");
-    }).then((productData) => {
-      products = productData;
-    });
-  });
-
-  beforeEach(() => {
-    LoginPage.login(users.standard.username, users.standard.password);
-    cy.location("pathname", { timeout: 15000 }).should("include", "/inventory.html");
+    cy.login(users.standard.username);
     InventoryPage.addProductByName(products.backpack.name);
     InventoryPage.addProductByName(products.bikeLight.name);
-    cy.visit("/cart.html", { failOnStatusCode: false });
+    InventoryPage.openCart();
   });
 
   it("deve completar checkout com sucesso", () => {
@@ -128,12 +116,10 @@ describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
   });
 
   it("deve permitir checkout com carrinho vazio (comportamento real do app)", () => {
-    cy.visit("/cart.html", { failOnStatusCode: false });
-
     CartPage.removeItemByName(products.backpack.name);
     CartPage.removeItemByName(products.bikeLight.name);
 
-    cy.get(".cart_item").should("not.exist");
+    CartPage.getItems().should("not.exist");
 
     CartPage.clickCheckout();
     CheckoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");

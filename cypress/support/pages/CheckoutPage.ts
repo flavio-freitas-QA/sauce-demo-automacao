@@ -1,3 +1,4 @@
+// Page Object das três etapas do checkout do Sauce Demo.
 class CheckoutPage {
   fillCustomerInfo(firstName: string, lastName: string, postalCode: string) {
     cy.get("[data-test='firstName']").should("be.visible").clear();
@@ -34,7 +35,7 @@ class CheckoutPage {
   }
 
   getConfirmationMessage() {
-    return cy.contains("h2", /Thank you for your order!/i);
+    return cy.get("[data-test='complete-header']");
   }
 
   getErrorMessage() {
@@ -50,15 +51,15 @@ class CheckoutPage {
   }
 
   getItemTotal() {
-    return cy.contains(".summary_subtotal_label", /Item total:/i).invoke("text");
+    return cy.get("[data-test='subtotal-label']").invoke("text");
   }
 
   getTax() {
-    return cy.contains(".summary_tax_label", /Tax:/i).invoke("text");
+    return cy.get("[data-test='tax-label']").invoke("text");
   }
 
   getTotal() {
-    return cy.contains(".summary_total_label", /Total:/i).invoke("text");
+    return cy.get("[data-test='total-label']").invoke("text");
   }
 }
 

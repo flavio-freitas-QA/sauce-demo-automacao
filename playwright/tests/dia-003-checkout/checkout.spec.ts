@@ -1,5 +1,4 @@
-import { test, expect } from "@playwright/test";
-import { LoginPage } from "../../pages/LoginPage";
+import { test, expect } from "../../support/fixtures";
 import { InventoryPage } from "../../pages/InventoryPage";
 import { CartPage } from "../../pages/CartPage";
 import { CheckoutPage } from "../../pages/CheckoutPage";
@@ -9,16 +8,13 @@ import products from "../../fixtures/products.json";
 const parsePrice = (value: string | null) => Number((value || "").replace(/[^0-9.]/g, ""));
 
 test.describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
-  test.beforeEach(async ({ page }) => {
-    const loginPage = new LoginPage(page);
+  test.beforeEach(async ({ page, loginAs }) => {
     const inventoryPage = new InventoryPage(page);
-    const cartPage = new CartPage(page);
 
-    await loginPage.login(users.standard.username, users.standard.password);
-    await expect(page).toHaveURL(/inventory\.html/);
+    await loginAs(users.standard.username);
     await inventoryPage.addProductByName(products.backpack.name);
     await inventoryPage.addProductByName(products.bikeLight.name);
-    await cartPage.goto();
+    await inventoryPage.openCart();
   });
 
   test("deve completar checkout com sucesso", async ({ page }) => {
@@ -33,7 +29,7 @@ test.describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
 
     await expect(page).toHaveURL(/checkout-complete\.html/);
     await expect(checkoutPage.confirmationMessage).toContainText("Thank you for your order!");
-    await expect(page.locator(".shopping_cart_badge")).toHaveCount(0);
+    await expect(page.locator("[data-test='shopping-cart-badge']")).toHaveCount(0);
   });
 
   test("deve validar erro ao avançar sem preencher nome", async ({ page }) => {
@@ -99,21 +95,6 @@ test.describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
     await expect(checkoutPage.itemTotal).toContainText(`$${expectedSubtotal.toFixed(2)}`);
   });
 
-  test("deve calcular corretamente o total na Etapa 2", async ({ page }) => {
-    const cartPage = new CartPage(page);
-    const checkoutPage = new CheckoutPage(page);
-    const expectedSubtotal = parsePrice(products.backpack.price) + parsePrice(products.bikeLight.price);
-    const expectedTax = Number((expectedSubtotal * 0.08).toFixed(2));
-    const expectedTotal = Number((expectedSubtotal + expectedTax).toFixed(2));
-
-    await cartPage.clickCheckout();
-    await checkoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
-    await checkoutPage.clickContinue();
-    await page.waitForURL(/checkout-step-two\.html/, { timeout: 15000 });
-    await expect(checkoutPage.tax).toContainText(`$${expectedTax.toFixed(2)}`);
-    await expect(checkoutPage.total).toContainText(`$${expectedTotal.toFixed(2)}`);
-  });
-
   test("deve calcular corretamente a taxa na Etapa 2", async ({ page }) => {
     const cartPage = new CartPage(page);
     const checkoutPage = new CheckoutPage(page);
@@ -125,6 +106,20 @@ test.describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
     await checkoutPage.clickContinue();
     await page.waitForURL(/checkout-step-two\.html/, { timeout: 15000 });
     await expect(checkoutPage.tax).toContainText(`$${expectedTax.toFixed(2)}`);
+  });
+
+  test("deve calcular corretamente o total na Etapa 2", async ({ page }) => {
+    const cartPage = new CartPage(page);
+    const checkoutPage = new CheckoutPage(page);
+    const expectedSubtotal = parsePrice(products.backpack.price) + parsePrice(products.bikeLight.price);
+    const expectedTax = Number((expectedSubtotal * 0.08).toFixed(2));
+    const expectedTotal = Number((expectedSubtotal + expectedTax).toFixed(2));
+
+    await cartPage.clickCheckout();
+    await checkoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
+    await checkoutPage.clickContinue();
+    await page.waitForURL(/checkout-step-two\.html/, { timeout: 15000 });
+    await expect(checkoutPage.total).toContainText(`$${expectedTotal.toFixed(2)}`);
   });
 
   test("deve exibir o resumo dos itens corretamente na Etapa 2", async ({ page }) => {
@@ -150,7 +145,7 @@ test.describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
 
     await cartPage.removeItemByName(products.backpack.name);
     await cartPage.removeItemByName(products.bikeLight.name);
-    await expect(page.locator(".cart_item")).toHaveCount(0);
+    await expect(cartPage.items).toHaveCount(0);
 
     await cartPage.clickCheckout();
     await checkoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
@@ -169,7 +164,7 @@ test.describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
     await checkoutPage.clickContinue();
     await page.waitForURL(/checkout-step-two\.html/, { timeout: 15000 });
     await checkoutPage.clickFinish();
-    await expect(page.locator(".shopping_cart_badge")).toHaveCount(0);
+    await expect(page.locator("[data-test='shopping-cart-badge']")).toHaveCount(0);
   });
 
   test("deve retornar à tela de produtos ao clicar em Back Home", async ({ page }) => {
@@ -186,10 +181,12 @@ test.describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
   });
 });
 
-test("deve redirecionar ao acessar checkout diretamente sem login", async ({ page }) => {
-  for (const path of ["/checkout-step-one.html", "/checkout-step-two.html"]) {
-    await page.goto(path, { waitUntil: "domcontentloaded" });
-    await expect(page).toHaveURL(/\//);
-    await expect(page.getByText(`You can only access '${path}' when you are logged in.`)).toBeVisible();
-  }
+test.describe("Dia 003 - Fluxo de Checkout | Sauce Demo | Segurança", () => {
+  test("deve redirecionar ao acessar checkout diretamente sem login", async ({ page }) => {
+    for (const path of ["/checkout-step-one.html", "/checkout-step-two.html"]) {
+      await page.goto(path, { waitUntil: "domcontentloaded" });
+      await expect(page).toHaveURL(/\//);
+      await expect(page.getByText(`You can only access '${path}' when you are logged in.`)).toBeVisible();
+    }
+  });
 });
