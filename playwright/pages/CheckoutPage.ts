@@ -14,6 +14,8 @@ export class CheckoutPage {
   readonly itemTotal: Locator;
   readonly tax: Locator;
   readonly total: Locator;
+  readonly paymentInfo: Locator;
+  readonly shippingInfo: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -29,6 +31,8 @@ export class CheckoutPage {
     this.itemTotal = page.locator("[data-test='subtotal-label']");
     this.tax = page.locator("[data-test='tax-label']");
     this.total = page.locator("[data-test='total-label']");
+    this.paymentInfo = page.locator("[data-test='payment-info-value']");
+    this.shippingInfo = page.locator("[data-test='shipping-info-value']");
   }
 
   async fillCustomerInfo(firstName: string, lastName: string, postalCode: string) {

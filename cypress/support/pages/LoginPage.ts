@@ -21,6 +21,14 @@ class LoginPage {
     return cy.get("[data-test='error']");
   }
 
+  closeError() {
+    cy.get("[data-test='error-button']").click();
+  }
+
+  submitWithEnter() {
+    cy.get("[data-test='password']").type("{enter}");
+  }
+
   login(username: string, password: string) {
     this.visit();
     this.fillUsername(username);

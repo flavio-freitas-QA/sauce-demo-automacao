@@ -74,6 +74,10 @@ class InventoryPage {
   getFooterLinks() {
     return cy.get("[data-test='footer'] a");
   }
+
+  getProductImages() {
+    return cy.get(".inventory_item_img img");
+  }
 }
 
 export default new InventoryPage();

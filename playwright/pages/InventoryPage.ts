@@ -81,4 +81,8 @@ export class InventoryPage {
   footerLinks() {
     return this.page.locator("[data-test='footer'] a");
   }
+
+  productImages() {
+    return this.page.locator(".inventory_item_img img");
+  }
 }

@@ -50,6 +50,14 @@ class CheckoutPage {
     return cy.contains(".cart_item", name);
   }
 
+  getPaymentInfo() {
+    return cy.get("[data-test='payment-info-value']");
+  }
+
+  getShippingInfo() {
+    return cy.get("[data-test='shipping-info-value']");
+  }
+
   getItemTotal() {
     return cy.get("[data-test='subtotal-label']").invoke("text");
   }

@@ -30,6 +30,7 @@ Demonstrar, de forma prática e contínua, domínio em:
 | 005 | Cypress + Playwright | Catálogo, menu lateral e performance | Ordenação, detalhe do produto, footer, reset/logout/about e `performance_glitch_user` |
 | 006 | Cypress + Playwright | Usuários especiais (Sauce Demo) | `problem_user`, `error_user`, `visual_user` e bugs conhecidos documentados |
 | 007 | Cypress + Playwright | Refatoração da suíte | Login programático (`cy.session` / fixture `loginAs`), seletores `data-test`, fixtures tipadas, relatório mochawesome |
+| 008 | Cypress + Playwright | Cenários avançados (Sauce Demo) | Guarda de rota completa, sessão expirada, produto inexistente, payment/shipping info, checkout com 6 itens, alertas nativos e bugs extras |
 
 > Tabela atualizada a cada novo dia. Detalhes de cada entrada em [`docs/`](./docs).
 

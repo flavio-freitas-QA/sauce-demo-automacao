@@ -30,6 +30,14 @@ export class CartPage {
     return this.getItemByName(name).locator("[data-test='inventory-item-price']").textContent();
   }
 
+  async clickItemName(name: string) {
+    await this.getItemByName(name).locator("[data-test='inventory-item-name']").click();
+  }
+
+  getItemQuantity(name: string) {
+    return this.getItemByName(name).locator("[data-test='item-quantity']");
+  }
+
   async removeItemByName(name: string) {
     await this.getItemByName(name).locator("button").click();
   }

@@ -25,6 +25,14 @@ class CartPage {
     return this.getItemByName(name).find("[data-test='inventory-item-price']");
   }
 
+  clickItemName(name: string) {
+    this.getItemByName(name).find("[data-test='inventory-item-name']").click();
+  }
+
+  getItemQuantity(name: string) {
+    return this.getItemByName(name).find("[data-test='item-quantity']");
+  }
+
   removeItemByName(name: string) {
     this.getItemByName(name).find("button").contains(/remove/i).click();
   }
