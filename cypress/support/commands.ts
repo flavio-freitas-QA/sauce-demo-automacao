@@ -25,6 +25,31 @@ Cypress.Commands.add("login", (username: string) => {
   cy.get("[data-test='inventory-list']", { timeout: 30000 }).should("be.visible");
 });
 
+// Mede a ancoragem do ícone do carrinho em relação ao cabeçalho.
+// Usado na regressão visual geométrica do dia 009.
+Cypress.Commands.add("getCartAnchoring", () => {
+  return cy.document().then((doc) => {
+    const header = doc.querySelector("[data-test='primary-header']")!.getBoundingClientRect();
+    const cart = doc.querySelector("[data-test='shopping-cart-link']")!.getBoundingClientRect();
+
+    return {
+      gapDireita: Math.round(header.right - cart.right),
+      transbordaHeader: cart.bottom > header.bottom,
+    };
+  });
+});
+
+// Retorna as colunas (posições x distintas) ocupadas pelos botões do catálogo.
+Cypress.Commands.add("getButtonColumns", () => {
+  return cy.get(".btn_inventory").then(($buttons) => {
+    const xs = Cypress._.map($buttons.toArray(), (button) =>
+      Math.round(button.getBoundingClientRect().x),
+    );
+
+    return Cypress._.sortBy(Cypress._.uniq(xs));
+  });
+});
+
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -33,6 +58,10 @@ declare global {
        * e navega até o inventário.
        */
       login(username: string): Chainable<void>;
+      /** Geometria do ícone do carrinho em relação ao cabeçalho. */
+      getCartAnchoring(): Chainable<{ gapDireita: number; transbordaHeader: boolean }>;
+      /** Posições x distintas dos botões de ação do catálogo. */
+      getButtonColumns(): Chainable<number[]>;
     }
   }
 }

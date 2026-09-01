@@ -16,14 +16,33 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
+  // Baselines visuais versionados por plataforma: a renderização de fontes
+  // difere entre Windows e Linux, então o nome do arquivo carrega o SO.
+  snapshotPathTemplate: "playwright/visual-baselines/{testFileName}/{arg}-{platform}{ext}",
+  expect: {
+    toHaveScreenshot: {
+      // Tolera ruído de antialiasing sem deixar passar regressão real.
+      maxDiffPixelRatio: 0.01,
+      animations: "disabled",
+    },
+  },
   projects: [
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+      testIgnore: "**/dia-009-regressao-visual/**",
     },
     {
       name: "firefox",
       use: { ...devices["Desktop Firefox"] },
+      testIgnore: "**/dia-009-regressao-visual/**",
+    },
+    {
+      // Projeto dedicado à regressão visual: viewport travado para que o
+      // baseline não dependa do tamanho da janela de quem executa.
+      name: "visual",
+      testMatch: "**/dia-009-regressao-visual/**",
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 720 } },
     },
   ],
 });

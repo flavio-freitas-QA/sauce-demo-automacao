@@ -1,6 +1,9 @@
 import { defineConfig } from "cypress";
 
 export default defineConfig({
+  // O projeto não usa Cypress.env(); desabilitar remove o aviso de
+  // depreciação do Cypress 15 e fecha o acesso do browser a essas variáveis.
+  allowCypressEnv: false,
   reporter: "cypress-mochawesome-reporter",
   reporterOptions: {
     reportDir: "cypress/reports",

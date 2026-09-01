@@ -61,6 +61,13 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps
       - run: npm run pw:test
+      - name: Regressão visual (sem comparar baseline)
+        # Os baselines de imagem são gerados no Windows do desenvolvedor e a
+        # renderização de fonte difere no Linux do runner. Aqui a suíte visual
+        # roda com --ignore-snapshots: valida que os testes executam e que as
+        # asserções de layout passam, sem falhar por diferença de plataforma.
+        # A comparação de imagem roda localmente com `npm run pw:visual`.
+        run: npm run pw:visual:ci
       - name: Gerar resumo no GitHub Actions
         if: always()
         run: npm run pw:summary

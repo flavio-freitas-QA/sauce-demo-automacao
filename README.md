@@ -31,6 +31,7 @@ Demonstrar, de forma prática e contínua, domínio em:
 | 006 | Cypress + Playwright | Usuários especiais (Sauce Demo) | `problem_user`, `error_user`, `visual_user` e bugs conhecidos documentados |
 | 007 | Cypress + Playwright | Refatoração da suíte | Login programático (`cy.session` / fixture `loginAs`), seletores `data-test`, fixtures tipadas, relatório mochawesome |
 | 008 | Cypress + Playwright | Cenários avançados (Sauce Demo) | Guarda de rota completa, sessão expirada, produto inexistente, payment/shipping info, checkout com 6 itens, alertas nativos e bugs extras |
+| 009 | Cypress + Playwright | Regressão visual (`visual_user`) | `toHaveScreenshot` com baselines por plataforma, snapshots de componente e asserções geométricas de layout |
 
 > Tabela atualizada a cada novo dia. Detalhes de cada entrada em [`docs/`](./docs).
 
@@ -57,6 +58,7 @@ sauce-demo-automacao/
 │   ├── tests/                 # specs organizados por dia
 │   ├── pages/                  # Page Objects
 │   ├── support/                # fixtures customizadas (ex: loginAs)
+│   ├── visual-baselines/       # baselines de regressão visual (por plataforma)
 │   └── fixtures/
 ├── postman/
 │   ├── collections/            # collections por dia de API
@@ -78,9 +80,13 @@ npm run cy:open      # modo interativo
 npm run cy:run        # modo headless
 
 # Playwright
-npm run pw:test        # roda todos os testes
+npm run pw:test         # suíte funcional (chromium + firefox)
 npm run pw:test:ui      # modo interativo (UI mode)
 npm run pw:report       # abre o último relatório
+
+# Regressão visual (Playwright)
+npm run pw:visual        # compara contra os baselines versionados
+npm run pw:visual:update # regenera baselines após mudança intencional
 
 # API (Postman via Newman)
 npm run api:test
