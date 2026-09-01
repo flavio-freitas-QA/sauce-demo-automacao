@@ -32,14 +32,15 @@ Demonstrar, de forma prática e contínua, domínio em:
 | 007 | Cypress + Playwright | Refatoração da suíte | Login programático (`cy.session` / fixture `loginAs`), seletores `data-test`, fixtures tipadas, relatório mochawesome |
 | 008 | Cypress + Playwright | Cenários avançados (Sauce Demo) | Guarda de rota completa, sessão expirada, produto inexistente, payment/shipping info, checkout com 6 itens, alertas nativos e bugs extras |
 | 009 | Cypress + Playwright | Regressão visual (`visual_user`) | `toHaveScreenshot` com baselines por plataforma, snapshots de componente e asserções geométricas de layout |
+| 010 | Cypress + Playwright | Acessibilidade e mobile | axe-core (WCAG 2.1 A/AA) com violações conhecidas mapeadas, e suíte mobile em WebKit (iPhone 13) |
 
 > Tabela atualizada a cada novo dia. Detalhes de cada entrada em [`docs/`](./docs).
 
 ## 🛠️ Stack técnica
 
 - TypeScript
-- Cypress
-- Playwright
+- Cypress (+ cypress-axe, mochawesome)
+- Playwright (+ @axe-core/playwright) — Chromium, Firefox e WebKit
 - Postman / Newman (CLI)
 - GitHub Actions (CI)
 
@@ -53,6 +54,7 @@ sauce-demo-automacao/
 │   └── support/
 │       ├── pages/              # Page Objects
 │       ├── commands.ts         # comandos customizados
+│       ├── a11y.ts             # regras e violações conhecidas (axe-core)
 │       └── e2e.ts              # config global
 ├── playwright/
 │   ├── tests/                 # specs organizados por dia
@@ -80,7 +82,8 @@ npm run cy:open      # modo interativo
 npm run cy:run        # modo headless
 
 # Playwright
-npm run pw:test         # suíte funcional (chromium + firefox)
+npm run pw:test         # suíte funcional (chromium + firefox) e mobile (webkit)
+npm run pw:mobile       # apenas a suíte mobile (iPhone 13 / WebKit)
 npm run pw:test:ui      # modo interativo (UI mode)
 npm run pw:report       # abre o último relatório
 

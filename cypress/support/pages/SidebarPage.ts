@@ -5,14 +5,18 @@ class SidebarPage {
   // recebe o clique é o <button> da lib react-burger-menu — por isso o id.
   // O timeout é folgado de propósito: o menu tem transição de slide e a
   // montagem pode atrasar quando o site público responde devagar.
+  // O `aria-hidden` do wrapper é o sinal de estado do menu (a lib
+  // react-burger-menu o alterna no clique). Esperar por ele e, depois, pelo
+  // item visível separa "o clique pegou" de "a animação de slide terminou".
   openMenu() {
     cy.get("#react-burger-menu-btn").should("be.visible").click();
-    cy.get(".bm-menu-wrap", { timeout: 15000 }).should("be.visible");
+    cy.get(".bm-menu-wrap", { timeout: 15000 }).should("have.attr", "aria-hidden", "false");
+    this.getAllItemsLink().should("be.visible");
   }
 
   closeMenu() {
     cy.get("#react-burger-cross-btn").should("be.visible").click();
-    cy.get(".bm-menu-wrap", { timeout: 15000 }).should("not.be.visible");
+    cy.get(".bm-menu-wrap", { timeout: 15000 }).should("have.attr", "aria-hidden", "true");
   }
 
   getAllItemsLink() {

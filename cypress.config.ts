@@ -29,6 +29,14 @@ export default defineConfig({
     },
     setupNodeEvents(on, config) {
       require("cypress-mochawesome-reporter/plugin")(on);
+      // Permite que os testes de acessibilidade imprimam as violações no
+      // terminal — sem isso a falha mostra só a contagem.
+      on("task", {
+        log(message: string) {
+          console.log(message);
+          return null;
+        },
+      });
       return config;
     },
   },

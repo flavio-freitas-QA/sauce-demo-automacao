@@ -6,7 +6,8 @@
   "scripts": {
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "pw:test": "playwright test --project=chromium --project=firefox",
+    "pw:test": "playwright test --project=chromium --project=firefox --project=mobile",
+    "pw:mobile": "playwright test --project=mobile",
     "pw:test:ui": "playwright test --ui",
     "pw:report": "playwright show-report",
     "pw:visual": "playwright test --project=visual",
@@ -30,9 +31,12 @@
   "author": "Flavio",
   "license": "ISC",
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.0",
+    "axe-core": "^4.13.0",
     "cypress": "^15.18.0",
+    "cypress-axe": "^1.7.0",
     "cypress-mochawesome-reporter": "^5.0.0",
     "newman": "^6.2.2",
     "typescript": "^6.0.3"

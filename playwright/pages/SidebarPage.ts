@@ -22,12 +22,26 @@ export class SidebarPage {
   // recebe o clique é o <button> da lib react-burger-menu — por isso o id.
   // O timeout é folgado de propósito: o menu tem transição de slide e, com a
   // suíte inteira em paralelo contra o site público, a montagem pode atrasar.
+  // Abrir o menu tem dois passos que é preciso distinguir:
+  //
+  // 1. O clique pode ser perdido se o React ainda não ligou o handler — aí o
+  //    menu simplesmente nunca abre. O `aria-hidden` do wrapper vira "false"
+  //    no instante do clique (antes da animação), então serve para saber se o
+  //    clique pegou e repetir apenas quando não pegou, sem risco de fechar um
+  //    menu já aberto.
+  // 2. A animação de slide leva ~1s, e os itens só ficam clicáveis no fim.
   async openMenu() {
     const button = this.page.locator("#react-burger-menu-btn");
-
     await expect(button).toBeVisible();
-    await button.click();
-    await expect(this.menuWrap).toBeVisible({ timeout: 15000 });
+
+    await expect(async () => {
+      if ((await this.menuWrap.getAttribute("aria-hidden")) !== "false") {
+        await button.click();
+      }
+      await expect(this.menuWrap).toHaveAttribute("aria-hidden", "false", { timeout: 2000 });
+    }).toPass({ timeout: 20000 });
+
+    await expect(this.allItemsLink).toBeVisible({ timeout: 15000 });
   }
 
   async closeMenu() {
@@ -35,7 +49,7 @@ export class SidebarPage {
 
     await expect(button).toBeVisible();
     await button.click();
-    await expect(this.menuWrap).not.toBeVisible({ timeout: 15000 });
+    await expect(this.menuWrap).toHaveAttribute("aria-hidden", "true", { timeout: 15000 });
   }
 
   async clickAllItems() {

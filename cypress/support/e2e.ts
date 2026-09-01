@@ -2,6 +2,7 @@
 // Importa comandos customizados e registra o reporter HTML (mochawesome).
 import "./commands";
 import "cypress-mochawesome-reporter/register";
+import "cypress-axe";
 
 // Nenhum handler global de "uncaught:exception" aqui de propósito:
 // engolir toda exceção esconderia erros reais da aplicação. Os specs que
