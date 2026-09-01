@@ -33,6 +33,7 @@ Demonstrar, de forma prática e contínua, domínio em:
 | 008 | Cypress + Playwright | Cenários avançados (Sauce Demo) | Guarda de rota completa, sessão expirada, produto inexistente, payment/shipping info, checkout com 6 itens, alertas nativos e bugs extras |
 | 009 | Cypress + Playwright | Regressão visual (`visual_user`) | `toHaveScreenshot` com baselines por plataforma, snapshots de componente e asserções geométricas de layout |
 | 010 | Cypress + Playwright | Acessibilidade e mobile | axe-core (WCAG 2.1 A/AA) com violações conhecidas mapeadas, e suíte mobile em WebKit (iPhone 13) |
+| 011 | CI/CD | Estratégia de execução | Suíte `@smoke` (tags nativas no Playwright, `@cypress/grep` no Cypress), execução diária agendada e resumos uniformes das 3 suítes |
 
 > Tabela atualizada a cada novo dia. Detalhes de cada entrada em [`docs/`](./docs).
 
@@ -77,13 +78,18 @@ Pré-requisitos: Node.js 20+
 # instalar dependências
 npm install
 
+# Suíte de fumaça (caminhos críticos, nas duas ferramentas)
+npm run smoke
+
 # Cypress
 npm run cy:open      # modo interativo
 npm run cy:run        # modo headless
+npm run cy:smoke      # apenas os cenários @smoke
 
 # Playwright
 npm run pw:test         # suíte funcional (chromium + firefox) e mobile (webkit)
 npm run pw:mobile       # apenas a suíte mobile (iPhone 13 / WebKit)
+npm run pw:smoke        # apenas os cenários @smoke
 npm run pw:test:ui      # modo interativo (UI mode)
 npm run pw:report       # abre o último relatório
 
@@ -100,13 +106,15 @@ npm run test:all
 
 ## 🔄 CI/CD
 
-Todo push/PR para `main` dispara automaticamente:
-1. Type check (TypeScript)
-2. Suíte Cypress (Chrome)
-3. Suíte Playwright (Chromium + Firefox)
-4. Testes de API (Newman)
+O pipeline roda type check, Cypress, Playwright (Chromium, Firefox e WebKit) e testes de API. O escopo varia conforme o evento:
 
-Relatórios do Playwright, relatório HTML do Cypress (mochawesome) e screenshots de falhas ficam disponíveis como artifacts do workflow.
+| Evento | O que roda |
+|--------|------------|
+| Pull request | apenas a suíte `@smoke` — retorno rápido na revisão |
+| Push na `main` | suíte completa |
+| Diariamente (09h UTC) | suíte completa — o alvo é um site de terceiros, então a suíte também monitora mudanças nele |
+
+As três suítes publicam um resumo com as contagens na própria página do workflow. Relatório HTML do Cypress (mochawesome), relatório do Playwright, JSONs do Newman e screenshots de falhas ficam disponíveis como artifacts.
 
 ## 👤 Autor
 

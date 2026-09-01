@@ -11,7 +11,7 @@ import products from "../../fixtures/products.json";
 // As páginas abaixo estão limpas hoje, então a exigência é de ZERO violações:
 // qualquer regressão de acessibilidade quebra o teste.
 test.describe("Dia 010 - Acessibilidade | Sauce Demo | Paginas sem violacoes", () => {
-  test("a tela de login nao deve ter violacoes", async ({ page }) => {
+  test("a tela de login nao deve ter violacoes", { tag: "@smoke" }, async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.goto();

@@ -10,7 +10,7 @@ test.describe("Dia 008 - Catalogo e Carrinho | Sauce Demo", () => {
     await loginAs(users.standard.username);
   });
 
-  test("deve exibir os 6 produtos com nome, descricao e preco conforme a massa de dados", async ({ page }) => {
+  test("deve exibir os 6 produtos com nome, descricao e preco conforme a massa de dados", { tag: "@smoke" }, async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
     const allProducts = Object.values(products);
 

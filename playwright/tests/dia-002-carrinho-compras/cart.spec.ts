@@ -18,7 +18,7 @@ test.describe("Dia 002 - Fluxo de Carrinho | Sauce Demo", () => {
     await loginAs(users.standard.username);
   });
 
-  test("deve adicionar 1 produto e atualizar o contador do carrinho", async ({ page }) => {
+  test("deve adicionar 1 produto e atualizar o contador do carrinho", { tag: "@smoke" }, async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
     await inventoryPage.addProductByName(products.backpack.name);
     await expect.poll(() => inventoryPage.getCartBadgeCount()).toBe(1);
@@ -119,7 +119,7 @@ test.describe("Dia 002 - Fluxo de Carrinho | Sauce Demo", () => {
 });
 
 test.describe("Dia 002 - Fluxo de Carrinho | Sauce Demo | Acesso direto", () => {
-  test("deve redirecionar ao acessar o carrinho sem login", async ({ page }) => {
+  test("deve redirecionar ao acessar o carrinho sem login", { tag: "@smoke" }, async ({ page }) => {
     await page.goto("/cart.html", { waitUntil: "domcontentloaded" });
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByText("You can only access '/cart.html' when you are logged in.")).toBeVisible();

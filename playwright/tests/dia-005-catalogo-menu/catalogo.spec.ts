@@ -25,7 +25,7 @@ test.describe("Dia 005 - Catalogo e Menu | Sauce Demo | Ordenacao", () => {
     expect(names).toEqual(sortedAsc(names).reverse());
   });
 
-  test("deve ordenar produtos por preco menor-maior", async ({ page }) => {
+  test("deve ordenar produtos por preco menor-maior", { tag: "@smoke" }, async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
     await inventoryPage.sortProducts("lohi");
     const prices = await inventoryPage.getAllProductPrices();

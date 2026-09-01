@@ -10,7 +10,7 @@ import products from "../../fixtures/products.json";
 // As páginas abaixo estão limpas hoje, então a exigência é de ZERO violações:
 // qualquer regressão de acessibilidade quebra o teste.
 describe("Dia 010 - Acessibilidade | Sauce Demo | Páginas sem violações", () => {
-  it("a tela de login não deve ter violações", () => {
+  it("a tela de login não deve ter violações", { tags: "@smoke" }, () => {
     LoginPage.visit();
     cy.injectAxe();
     cy.checkA11y(undefined, axeRunOptions, logViolations);

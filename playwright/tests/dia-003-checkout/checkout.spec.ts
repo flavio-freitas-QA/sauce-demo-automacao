@@ -17,7 +17,7 @@ test.describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
     await inventoryPage.openCart();
   });
 
-  test("deve completar checkout com sucesso", async ({ page }) => {
+  test("deve completar checkout com sucesso", { tag: "@smoke" }, async ({ page }) => {
     const cartPage = new CartPage(page);
     const checkoutPage = new CheckoutPage(page);
 

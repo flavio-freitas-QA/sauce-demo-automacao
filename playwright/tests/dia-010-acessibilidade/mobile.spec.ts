@@ -56,7 +56,7 @@ test.describe("Dia 010 - Responsividade | Sauce Demo | Mobile", () => {
     await sidebarPage.closeMenu();
   });
 
-  test("deve completar uma compra inteira em viewport de celular", async ({ page }) => {
+  test("deve completar uma compra inteira em viewport de celular", { tag: "@smoke" }, async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
     const cartPage = new CartPage(page);
     const checkoutPage = new CheckoutPage(page);

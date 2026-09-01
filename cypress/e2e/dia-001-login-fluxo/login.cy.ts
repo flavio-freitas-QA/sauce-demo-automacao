@@ -5,13 +5,13 @@ import users from "../../fixtures/users.json";
 // Único dia que exercita o login pela UI de ponta a ponta.
 // Os demais fluxos autenticam via cy.login (sessão programática).
 describe("Dia 001 - Fluxo de Login | Sauce Demo", () => {
-  it("deve logar com sucesso usando usuário padrão", () => {
+  it("deve logar com sucesso usando usuário padrão", { tags: "@smoke" }, () => {
     LoginPage.login(users.standard.username, users.standard.password);
     cy.url().should("include", "/inventory.html");
     cy.get("[data-test='title']").should("contain.text", "Products");
   });
 
-  it("deve exibir erro ao tentar logar com senha inválida", () => {
+  it("deve exibir erro ao tentar logar com senha inválida", { tags: "@smoke" }, () => {
     LoginPage.login(users.invalidPassword.username, users.invalidPassword.password);
     LoginPage.getErrorMessage().should(
       "contain.text",

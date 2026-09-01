@@ -4,14 +4,14 @@ import { SidebarPage } from "../../pages/SidebarPage";
 import users from "../../fixtures/users.json";
 
 test.describe("Dia 001 - Fluxo de Login | Sauce Demo (Playwright)", () => {
-  test("deve logar com sucesso usando usuário padrão", async ({ page }) => {
+  test("deve logar com sucesso usando usuário padrão", { tag: "@smoke" }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.login(users.standard.username, users.standard.password);
     await expect(page).toHaveURL(/inventory.html/);
     await expect(page.locator("[data-test='title']")).toHaveText("Products");
   });
 
-  test("deve exibir erro ao tentar logar com senha inválida", async ({ page }) => {
+  test("deve exibir erro ao tentar logar com senha inválida", { tag: "@smoke" }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.login(users.invalidPassword.username, users.invalidPassword.password);
     await loginPage.expectError("Username and password do not match");

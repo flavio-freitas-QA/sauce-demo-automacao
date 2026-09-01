@@ -1,4 +1,5 @@
 import { defineConfig } from "cypress";
+import { plugin as cypressGrepPlugin } from "@cypress/grep/plugin";
 
 export default defineConfig({
   // O projeto não usa Cypress.env(); desabilitar remove o aviso de
@@ -32,6 +33,8 @@ export default defineConfig({
     },
     setupNodeEvents(on, config) {
       require("cypress-mochawesome-reporter/plugin")(on);
+      // Filtragem por tags: `cypress run --expose grepTags=@smoke`.
+      cypressGrepPlugin(config);
       // Permite que os testes de acessibilidade imprimam as violações no
       // terminal — sem isso a falha mostra só a contagem.
       on("task", {

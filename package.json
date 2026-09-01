@@ -6,6 +6,7 @@
   "scripts": {
     "cy:open": "cypress open",
     "cy:run": "cypress run",
+    "cy:smoke": "cypress run --expose grepTags=@smoke,grepFilterSpecs=true,grepOmitFiltered=true",
     "pw:test": "playwright test --project=chromium --project=firefox --project=mobile",
     "pw:mobile": "playwright test --project=mobile",
     "pw:test:ui": "playwright test --ui",
@@ -13,11 +14,14 @@
     "pw:visual": "playwright test --project=visual",
     "pw:visual:update": "playwright test --project=visual --update-snapshots",
     "pw:test:ci": "playwright test --ignore-snapshots",
+    "pw:smoke": "playwright test --grep @smoke --ignore-snapshots",
+    "smoke": "npm run cy:smoke && npm run pw:smoke",
     "pw:summary": "node scripts/playwright-summary.js",
     "cy:summary": "node scripts/cypress-summary.js",
-    "api:test:jsonplaceholder": "newman run postman/collections/dia-004-jsonplaceholder.postman_collection.json -e postman/environments/jsonplaceholder.postman_environment.json",
-    "api:test:reqres": "newman run postman/collections/dia-004-reqres-auth.postman_collection.json -e postman/environments/reqres.postman_environment.json",
+    "api:test:jsonplaceholder": "newman run postman/collections/dia-004-jsonplaceholder.postman_collection.json -e postman/environments/jsonplaceholder.postman_environment.json -r cli,json --reporter-json-export newman/jsonplaceholder.json",
+    "api:test:reqres": "newman run postman/collections/dia-004-reqres-auth.postman_collection.json -e postman/environments/reqres.postman_environment.json -r cli,json --reporter-json-export newman/dummyjson.json",
     "api:test": "npm run api:test:jsonplaceholder && npm run api:test:reqres",
+    "api:summary": "node scripts/api-summary.js",
     "typecheck": "tsc --noEmit",
     "test:all": "npm run typecheck && npm run cy:run && npm run pw:test && npm run pw:visual && npm run api:test"
   },
@@ -33,6 +37,7 @@
   "license": "ISC",
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
+    "@cypress/grep": "^7.0.0",
     "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.0",
     "axe-core": "^4.13.0",

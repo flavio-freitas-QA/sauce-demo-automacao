@@ -8,7 +8,7 @@ describe("Dia 002 - Fluxo de Carrinho | Sauce Demo", () => {
     cy.login(users.standard.username);
   });
 
-  it("deve adicionar 1 produto e atualizar o contador do carrinho", () => {
+  it("deve adicionar 1 produto e atualizar o contador do carrinho", { tags: "@smoke" }, () => {
     const product = products.backpack;
 
     InventoryPage.addProductByName(product.name);
@@ -128,7 +128,7 @@ describe("Dia 002 - Fluxo de Carrinho | Sauce Demo", () => {
 });
 
 describe("Dia 002 - Fluxo de Carrinho | Sauce Demo | Acesso direto", () => {
-  it("deve redirecionar ao acessar o carrinho sem login", () => {
+  it("deve redirecionar ao acessar o carrinho sem login", { tags: "@smoke" }, () => {
     cy.visit("/cart.html", { failOnStatusCode: false });
     cy.location("pathname", { timeout: 15000 }).should("eq", "/");
     cy.contains("You can only access '/cart.html' when you are logged in.").should("be.visible");

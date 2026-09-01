@@ -14,7 +14,7 @@ describe("Dia 003 - Fluxo de Checkout | Sauce Demo", () => {
     InventoryPage.openCart();
   });
 
-  it("deve completar checkout com sucesso", () => {
+  it("deve completar checkout com sucesso", { tags: "@smoke" }, () => {
     CartPage.clickCheckout();
     CheckoutPage.fillCustomerInfo("Flavio", "Freitas", "12345");
     CheckoutPage.clickContinue();

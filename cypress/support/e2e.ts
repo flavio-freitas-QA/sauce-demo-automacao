@@ -3,6 +3,10 @@
 import "./commands";
 import "cypress-mochawesome-reporter/register";
 import "cypress-axe";
+import { register as registerCypressGrep } from "@cypress/grep";
+
+// Habilita a filtragem por tags (@smoke) via --expose grepTags=...
+registerCypressGrep();
 
 // Nenhum handler global de "uncaught:exception" aqui de propósito:
 // engolir toda exceção esconderia erros reais da aplicação. Os specs que

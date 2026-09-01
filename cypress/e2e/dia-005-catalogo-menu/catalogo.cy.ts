@@ -24,7 +24,7 @@ describe("Dia 005 - Catálogo e Menu | Sauce Demo | Ordenação", () => {
     });
   });
 
-  it("deve ordenar produtos por preço menor-maior", () => {
+  it("deve ordenar produtos por preço menor-maior", { tags: "@smoke" }, () => {
     InventoryPage.sortProducts("lohi");
     InventoryPage.getAllProductPrices().then((prices) => {
       const sorted = Cypress._.sortBy(prices);

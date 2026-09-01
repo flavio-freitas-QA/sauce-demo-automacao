@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Execução diária: o alvo é um site de terceiros, então a suíte também
+  # serve de monitor — se o Sauce Demo mudar, o build acusa no dia seguinte
+  # em vez de só no próximo commit.
+  schedule:
+    - cron: "0 9 * * *"
   workflow_dispatch:
 
 jobs:
@@ -20,6 +25,8 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
 
+  # Em pull request roda só a suíte @smoke, para dar retorno rápido na revisão.
+  # Em push na main e na execução agendada roda a suíte completa.
   cypress:
     name: Cypress E2E
     runs-on: ubuntu-latest
@@ -34,6 +41,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
+          command: ${{ github.event_name == 'pull_request' && 'npm run cy:smoke' || 'npm run cy:run' }}
       - name: Gerar resumo no GitHub Actions
         if: always()
         run: npm run cy:summary
@@ -63,7 +71,7 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npx playwright install --with-deps
-      - name: Rodar Playwright (todos os projetos)
+      - name: Rodar Playwright
         # Execução única, cobrindo funcional, mobile e visual. Rodar a suíte
         # visual num segundo comando sobrescreveria o results.json e o resumo
         # publicado abaixo passaria a contar só aqueles testes.
@@ -72,7 +80,7 @@ jobs:
         # desenvolvedor e a renderização de fonte difere no Linux do runner.
         # As asserções de layout do dia 009 continuam valendo; só a comparação
         # de imagem é pulada. Ela roda localmente com `npm run pw:visual`.
-        run: npm run pw:test:ci
+        run: ${{ github.event_name == 'pull_request' && 'npm run pw:smoke' || 'npm run pw:test:ci' }}
       - name: Gerar resumo no GitHub Actions
         if: always()
         run: npm run pw:summary
@@ -96,3 +104,13 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm run api:test
+      - name: Gerar resumo no GitHub Actions
+        if: always()
+        run: npm run api:summary
+      - name: Upload de relatórios do Newman
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newman-report
+          path: newman/
+          retention-days: 14

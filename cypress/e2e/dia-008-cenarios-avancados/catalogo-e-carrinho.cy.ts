@@ -9,7 +9,7 @@ describe("Dia 008 - Catálogo e Carrinho | Sauce Demo", () => {
     cy.login(users.standard.username);
   });
 
-  it("deve exibir os 6 produtos com nome, descrição e preço conforme a massa de dados", () => {
+  it("deve exibir os 6 produtos com nome, descrição e preço conforme a massa de dados", { tags: "@smoke" }, () => {
     const allProducts = Object.values(products);
 
     cy.get("[data-test='inventory-item']").should("have.length", allProducts.length);
