@@ -12,6 +12,9 @@ export default defineConfig({
     embeddedScreenshots: true,
     inlineAssets: true,
     saveAllAttempts: false,
+    // Mantém o JSON após gerar o HTML: é dele que o resumo publicado no
+    // GitHub Actions (scripts/cypress-summary.js) lê as contagens.
+    saveJson: true,
   },
   e2e: {
     baseUrl: "https://www.saucedemo.com",

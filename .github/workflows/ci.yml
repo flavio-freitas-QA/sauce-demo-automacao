@@ -34,6 +34,9 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
+      - name: Gerar resumo no GitHub Actions
+        if: always()
+        run: npm run cy:summary
       - name: Upload de screenshots em caso de falha
         uses: actions/upload-artifact@v4
         if: failure()
@@ -60,14 +63,16 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npx playwright install --with-deps
-      - run: npm run pw:test
-      - name: Regressão visual (sem comparar baseline)
-        # Os baselines de imagem são gerados no Windows do desenvolvedor e a
-        # renderização de fonte difere no Linux do runner. Aqui a suíte visual
-        # roda com --ignore-snapshots: valida que os testes executam e que as
-        # asserções de layout passam, sem falhar por diferença de plataforma.
-        # A comparação de imagem roda localmente com `npm run pw:visual`.
-        run: npm run pw:visual:ci
+      - name: Rodar Playwright (todos os projetos)
+        # Execução única, cobrindo funcional, mobile e visual. Rodar a suíte
+        # visual num segundo comando sobrescreveria o results.json e o resumo
+        # publicado abaixo passaria a contar só aqueles testes.
+        #
+        # --ignore-snapshots: os baselines de imagem são gerados no Windows do
+        # desenvolvedor e a renderização de fonte difere no Linux do runner.
+        # As asserções de layout do dia 009 continuam valendo; só a comparação
+        # de imagem é pulada. Ela roda localmente com `npm run pw:visual`.
+        run: npm run pw:test:ci
       - name: Gerar resumo no GitHub Actions
         if: always()
         run: npm run pw:summary
